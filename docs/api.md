@@ -64,7 +64,7 @@ returns Feedback
 
 **after_experience** Experience
 
-**unlocked_exercise** Exercise
+**unlocked_exercises** Array(Exercise)
 
 ## Set
 
