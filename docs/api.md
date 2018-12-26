@@ -9,7 +9,7 @@
 
 **description** string
 
-**measurement_type** string
+**[measurement_type](#measurement-type)** string
 
 **category_id** int
 
@@ -36,7 +36,7 @@ returns *experience* Array(Experience)
 
 **category** int
 
-**sets** Array(Set) 
+**sets** Array([Set](#set)) 
 
 **memo** string
 
@@ -57,7 +57,7 @@ returns Experience, Feedback, optional Exercise (unlocakble)
 **highlight_spans** Array([int, int]) //inclusive-exclusive
 
 ## Set
-**[measurement_type](##Measurement Type)** string
+**[measurement_type](#measurement-type)** string
 
 **set_number** int
 
