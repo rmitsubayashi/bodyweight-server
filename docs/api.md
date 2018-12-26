@@ -1,6 +1,8 @@
 # API Docs
 
 ## Exercise
+**id** int
+
 **title** string
 
 **level** int
@@ -29,12 +31,14 @@ returns Array(Exercise)
 **next_level_current** int
 
 ### GET /user/experiences
-returns *experience* Array(Experience)
+returns Array(Experience)
 
 ## Log
 **id** int
 
-**category** int
+**category_id** int
+
+**date** string //YYYY-MM-DD
 
 **sets** Array([Set](#set)) 
 
@@ -49,14 +53,27 @@ returns Array(Log) without memo
 returns Log with memo
 
 ### POST /logs
-returns Experience, Feedback, optional Exercise (unlocakble)
+returns Feedback
 
 ## Feedback
 **comment** string
 
-**highlight_spans** Array([int, int]) //inclusive-exclusive
+**comment_highlight_spans** Array([int, int]) //inclusive-exclusive
+
+**previous_experience** Experience
+
+**after_experience** Experience
+
+**unlocked_exercise** Exercise
 
 ## Set
+
+**id** int
+
+**exercise_id** int
+
+**exercise_title** string
+
 **[measurement_type](#measurement-type)** string
 
 **set_number** int
