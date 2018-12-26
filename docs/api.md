@@ -54,11 +54,14 @@ returns Experience, Feedback, optional Exercise (unlocakble)
 ## Feedback
 **comment** string
 
-**highlight_spans** Array([int, int]) //inclusive-exclusice
+**highlight_spans** Array([int, int]) //inclusive-exclusive
 
 ## Set
-**measurement_type** string
+**[measurement_type](##Measurement Type)** string
 
 **set_number** int
 
 **value** int
+
+## Measurement Type
+REP, SECONDS
