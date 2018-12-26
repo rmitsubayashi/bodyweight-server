@@ -1,46 +1,44 @@
 # API Docs
 
 ## Exercise
-*title* string
+**title** string
 
-*level* int
+**level** int
 
-*image_url* string
+**image_url** string
 
-*description* string
+**description** string
 
-*measurement_type string
+**measurement_type** string
 
-*category_id* int
+**category_id** int
 
-### GET /users/exercises/category_id=
-returns Array<Exercise>
+### GET /users/exercises/category_id=??
+returns Array(Exercise)
 
 ## User
-*id* int
+**id** int
 
-*experience* Array<Experience>
-
-*firebase_uid* string
-
-### GET /user
-returns User
+**firebase_uid** string
 
 ## Experience
-*level* int
+**level** int
 
-*next_level_total* int
+**next_level_total** int
 
-*next_level_current* int
+**next_level_current** int
+
+### GET /user/experiences
+returns *experience* Array(Experience)
 
 ## Log
-*id* int
+**id** int
 
-*category* int
+**category** int
 
-*sets* Array(Set) 
+**sets** Array(Set) 
 
-*memo* string
+**memo** string
 
 //Todo: get logs by month
 
@@ -51,10 +49,16 @@ returns Array(Log) without memo
 returns Log with memo
 
 ### POST /logs
+returns Experience, Feedback, optional Exercise (unlocakble)
+
+## Feedback
+**comment** string
+
+**highlight_spans** Array([int, int]) //inclusive-exclusice
 
 ## Set
-*measurement_type* string
+**measurement_type** string
 
-*set_number* int
+**set_number** int
 
-*value* int
+**value** int
