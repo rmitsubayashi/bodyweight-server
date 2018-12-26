@@ -13,7 +13,7 @@
 
 *category_id* int
 
-###GET /users/exercises/category_id=?
+### GET /users/exercises/category_id=
 returns Array<Exercise>
 
 ## User
@@ -38,9 +38,19 @@ returns User
 
 *category* int
 
-*sets* Array<Set>
+*sets* Array(Set) 
 
 *memo* string
+
+//Todo: get logs by month
+
+### GET /user/logs
+returns Array(Log) without memo
+
+### GET /user/logs/log_id
+returns Log with memo
+
+### POST /logs
 
 ## Set
 *measurement_type* string
@@ -48,13 +58,3 @@ returns User
 *set_number* int
 
 *value* int
-
-//Todo: get logs by month
-
-### GET /user/logs
-returns Array<Log> without memo
-
-### GET /user/logs/log_id
-returns Log with memo
-
-### POST /logs
