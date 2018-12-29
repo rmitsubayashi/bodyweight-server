@@ -32,6 +32,9 @@ returns Array(Exercise)
 ### GET /exercises/shop
 returns Array(ExerciseProduct)
 
+### POST /exercises/shop/purchase
+returns points
+
 ## User
 **id** int
 
