@@ -11,5 +11,5 @@ func NewRouter() *Router {
 }
 
 func (r *Router) Route() {
-	http.HandleFunc("/", NewTestHandler().test)
+	http.HandleFunc("/", NewDefaultHandler().pong)
 }
