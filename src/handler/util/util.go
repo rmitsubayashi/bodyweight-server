@@ -41,6 +41,13 @@ func SendError(w http.ResponseWriter, err error, status int) {
 
 }
 
-func SendData(w http.ResponseWriter, obj interface{}, key string) {
-	json.NewEncoder(w).Encode(obj)
+type Data struct {
+	Data interface{} `json:"data"`
+}
+
+func SendData(w http.ResponseWriter, obj interface{}) {
+	dataStruct := Data {
+		Data: obj,
+	}
+	json.NewEncoder(w).Encode(dataStruct)
 }

@@ -23,11 +23,17 @@ func (h *ExerciseHandler) GetExercises(w http.ResponseWriter, r *http.Request) {
 		util.SendError(w, err, http.StatusBadRequest)
 		return
 	}
-	categoryIDInt, _ := strconv.Atoi(categoryID)
+	categoryIDInt, err := strconv.Atoi(categoryID)
+	if err != nil {
+		util.SendError(w, err, http.StatusBadRequest)
+	}
+
 	exercises, err := h.UseCase.GetExercisesByCategory(categoryIDInt)
 	if err != nil {
+		//TODO split errors
 		util.SendError(w, err, http.StatusInternalServerError)
 		return
 	}
-	util.SendData(w, exercises, "exercises")
+
+	util.SendData(w, exercises)
 }
