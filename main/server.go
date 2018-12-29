@@ -6,12 +6,12 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/rmitsubayashi/bodyweight-server/src/registry"
+	"github.com/rmitsubayashi/bodyweight-server/src/handler"
 
 )
 
 func main() {
-	registry.NewRouter().Route()
+	handler.NewRouter().Route()
 
 	port := os.Getenv("PORT")
 	if port == "" {
