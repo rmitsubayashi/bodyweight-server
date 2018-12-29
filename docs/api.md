@@ -1,4 +1,5 @@
 # API Docs
+Responses follow the [JSON API specifications](https://jsonapi.org/)
 
 ## Exercise
 **id** int
