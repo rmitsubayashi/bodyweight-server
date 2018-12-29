@@ -15,20 +15,39 @@
 
 **category_id** int
 
+**target_sets** Array(Set)
+
+**quantity** int //-1 = infinite
+
 ### GET /users/exercises/category_id=??
 returns Array(Exercise)
+
+## ExerciseProduct
+**title** string
+
+**exercises** Array(Exercise)
+
+**price** int
+
+### GET /exercises/shop
+returns Array(ExerciseProduct)
 
 ## User
 **id** int
 
 **firebase_uid** string
 
+**points** int
+
+## GET /user/points
+returns User.points
+
 ## Experience
 **level** int
 
-**next_level_total** int
-
 **next_level_current** int
+
+**next_level_total** int
 
 ### GET /user/experiences
 returns Array(Experience)
@@ -63,6 +82,10 @@ returns Feedback
 **previous_experience** Experience
 
 **after_experience** Experience
+
+**previous_points** int
+
+**after_points** int
 
 **unlocked_exercises** Array(Exercise)
 
