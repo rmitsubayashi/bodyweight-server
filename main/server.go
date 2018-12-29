@@ -1,14 +1,17 @@
 package main
 
 import (
-	"net/http"
 	"os"
 	"fmt"
 	"log"
+	"net/http"
+
+	"github.com/rmitsubayashi/bodyweight-server/src/registry"
+
 )
 
 func main() {
-	http.HandleFunc("/", testHandler)
+	registry.NewRouter().Route()
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -18,12 +21,4 @@ func main() {
 
 	log.Printf("Listening on port %s", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
-}
-
-func testHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return
-	}
-	fmt.Fprint(w, "Hello, World!")
 }
