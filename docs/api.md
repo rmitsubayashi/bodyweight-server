@@ -43,6 +43,8 @@ returns Array(ExerciseProduct)
 returns User.points
 
 ## Experience
+**category_id** int
+
 **level** int
 
 **next_level_current** int
