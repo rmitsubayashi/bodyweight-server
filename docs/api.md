@@ -42,8 +42,10 @@ returns points
 
 **points** int
 
-## GET /user/points
+### GET /user/points
 returns User.points
+
+### POST /user
 
 ## Experience
 **category_id** int
