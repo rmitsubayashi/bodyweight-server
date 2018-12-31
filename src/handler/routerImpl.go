@@ -8,6 +8,7 @@ import (
 	"github.com/rmitsubayashi/bodyweight-server/src/handler/exerciseproduct"
 	"github.com/rmitsubayashi/bodyweight-server/src/handler/experience"
 	"github.com/rmitsubayashi/bodyweight-server/src/handler/log"
+	"github.com/rmitsubayashi/bodyweight-server/src/handler/user"
 )
 
 type RouterImpl struct{}
@@ -25,5 +26,7 @@ func (ri *RouterImpl) Route() {
 	r.HandleFunc("/shop/exercises", exerciseproduct.NewExerciseProductHandler().GetExerciseProducts).Methods(http.MethodGet)
 	r.HandleFunc("/shop/exercises/purchase", exerciseproduct.NewExerciseProductHandler().PostExerciseProduct).Methods(http.MethodPost)
 	r.HandleFunc("/users/experiences", experience.NewExperienceHandler().GetExperiences).Methods(http.MethodGet)
+	r.HandleFunc("/users", user.NewUserHandler().GetUser).Methods(http.MethodGet)
+	r.HandleFunc("/users", user.NewUserHandler().PostUser).Methods(http.MethodPost)
 	http.Handle("/", r)
 }
