@@ -51,3 +51,10 @@ func SendData(w http.ResponseWriter, obj interface{}) {
 	}
 	json.NewEncoder(w).Encode(dataStruct)
 }
+
+func GetData(r *http.Request, objRef interface{}) error {
+	if r.Body == nil {
+		return errors.New("Empty request body")
+	}
+	return json.NewDecoder(r.Body).Decode(&objRef)
+}
