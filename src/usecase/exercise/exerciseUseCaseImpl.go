@@ -6,7 +6,7 @@ import (
 
 type ExerciseUseCaseImpl struct {}
 
-func (uc *ExerciseUseCaseImpl) GetExercisesByCategory(categoryID int) ([]*client.Exercise, error) {
+func (uc *ExerciseUseCaseImpl) GetExerciseList(categoryID int) ([]*client.Exercise, error) {
 	return []*client.Exercise{
 		client.NewExercise(categoryID, client.ExerciseAttributes{}),
 	}, nil

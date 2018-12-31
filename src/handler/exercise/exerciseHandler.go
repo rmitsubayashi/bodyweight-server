@@ -28,7 +28,7 @@ func (h *ExerciseHandler) GetExercises(w http.ResponseWriter, r *http.Request) {
 		util.SendError(w, err, http.StatusBadRequest)
 	}
 
-	exercises, err := h.UseCase.GetExercisesByCategory(categoryIDInt)
+	exercises, err := h.UseCase.GetExerciseList(categoryIDInt)
 	if err != nil {
 		//TODO split errors
 		util.SendError(w, err, http.StatusInternalServerError)

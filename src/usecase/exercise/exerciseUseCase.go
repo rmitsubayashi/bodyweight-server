@@ -5,5 +5,5 @@ import (
 )
 
 type ExerciseUseCase interface {
-	GetExercisesByCategory(categoryID int) ([]*client.Exercise, error)
+	GetExerciseList(categoryID int) ([]*client.Exercise, error)
 }
