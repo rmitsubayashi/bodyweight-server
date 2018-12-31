@@ -13,7 +13,7 @@ type ExerciseAttributes struct {
 	Description string `json:"description"`
 	MeasurementType string `json:"measurement_type"`
 	CategoryID int `json:"category_id"`
-	TargetSets []Set `json:"target_sets"`
+	TargetSets []SetAttributes `json:"target_sets"`
 	Quantity int `json:"quantity"`
 }
 
