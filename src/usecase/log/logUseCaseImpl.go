@@ -8,25 +8,26 @@ type LogUseCaseImpl struct{}
 
 func (uc *LogUseCaseImpl) GetLogList(userID int) ([]*client.Log, error) {
 	return []*client.Log{
-		client.NewLog(1, client.LogAttributes{
+		&client.Log {
+			ID: 1,
 			CategoryID: 0,
 			Date:       "2018-12-29",
-			Sets: []client.SetAttributes{
-				client.SetAttributes{
+			Sets: []client.Set {
+				client.Set {
 					ExerciseID:      21,
 					ExerciseTitle:   "One arm pushups",
 					MeasurementType: "REP",
 					SetNumber:       1,
 					Value:           1,
 				},
-				client.SetAttributes{
+				client.Set {
 					ExerciseID:      20,
 					ExerciseTitle:   "Half one-arm pushups",
 					MeasurementType: "REP",
 					SetNumber:       2,
 					Value:           13,
 				},
-				client.SetAttributes{
+				client.Set {
 					ExerciseID:      20,
 					ExerciseTitle:   "Half one-arm pushups",
 					MeasurementType: "REP",
@@ -35,20 +36,21 @@ func (uc *LogUseCaseImpl) GetLogList(userID int) ([]*client.Log, error) {
 				},
 			},
 			Memo: "Did my first fucking one arm pushup!!!",
-		}),
+		},
 
-		client.NewLog(1, client.LogAttributes{
+		&client.Log {
+			ID: 1,
 			CategoryID: 0,
 			Date:       "2018-12-31",
-			Sets: []client.SetAttributes{
-				client.SetAttributes{
+			Sets: []client.Set {
+				client.Set {
 					ExerciseID:      21,
 					ExerciseTitle:   "One arm pushups",
 					MeasurementType: "REP",
 					SetNumber:       1,
 					Value:           2,
 				},
-				client.SetAttributes{
+				client.Set {
 					ExerciseID:      20,
 					ExerciseTitle:   "Half one-arm pushups",
 					MeasurementType: "REP",
@@ -57,23 +59,24 @@ func (uc *LogUseCaseImpl) GetLogList(userID int) ([]*client.Log, error) {
 				},
 			},
 			Memo: "Did two fucking one arm pushups!!!",
-		}),
+		},
 	}, nil
 }
 
 func (uc *LogUseCaseImpl) GetLogInfo(logID int) (*client.Log, error) {
-	return client.NewLog(logID, client.LogAttributes{
+	return &client.Log {
+		ID: logID,
 		CategoryID: 0,
 		Date:       "2018-12-31",
-		Sets: []client.SetAttributes{
-			client.SetAttributes{
+		Sets: []client.Set {
+			client.Set {
 				ExerciseID:      21,
 				ExerciseTitle:   "One arm pushups",
 				MeasurementType: "REP",
 				SetNumber:       1,
 				Value:           2,
 			},
-			client.SetAttributes{
+			client.Set {
 				ExerciseID:      20,
 				ExerciseTitle:   "Half one-arm pushups",
 				MeasurementType: "REP",
@@ -82,22 +85,23 @@ func (uc *LogUseCaseImpl) GetLogInfo(logID int) (*client.Log, error) {
 			},
 		},
 		Memo: "Did two fucking one arm pushups!!!",
-	}), nil
+	}, nil
 }
 
 func (uc *LogUseCaseImpl) RecordLog(log client.Log) (*client.Feedback, error) {
-	return client.NewFeedback(2, client.FeedbackAttributes{
+	return &client.Feedback {
+		ID: 2,
 		Comment: "Great job doing your first ever one arm pushup! You're definitely getting stronger!",
 		CommentHighlightSpans: [][2]int{
 			[2]int{21, 31},
 		},
-		PreviousExperience: client.ExperienceAttributes {
+		PreviousExperience: client.Experience {
 			CategoryID: 0,
 			Level: 20,
 			NextLevelCurrent: 210,
 			NextLevelTotal: 300,
 		},
-		AfterExperience: client.ExperienceAttributes {
+		AfterExperience: client.Experience {
 			CategoryID: 0,
 			Level: 20,
 			NextLevelCurrent: 230,
@@ -105,7 +109,7 @@ func (uc *LogUseCaseImpl) RecordLog(log client.Log) (*client.Feedback, error) {
 		},
 		PreviousPoints: 2300,
 		AfterPoints: 2400,
-	}), nil
+	}, nil
 }
 
 func NewLogUseCase() *LogUseCaseImpl {

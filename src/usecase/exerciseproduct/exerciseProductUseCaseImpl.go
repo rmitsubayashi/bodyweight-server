@@ -8,55 +8,59 @@ type ExerciseProductUseCaseImpl struct{}
 
 func (*ExerciseProductUseCaseImpl) GetAvailableExerciseProducts(userID int) ([]*client.ExerciseProduct, error) {
 	return []*client.ExerciseProduct{
-		client.NewExerciseProduct(2, client.ExerciseProductAttributes{
+		&client.ExerciseProduct{
+			ID: 2,
 			Title: "chest focus set",
 			Exercises: []client.Exercise{
-				*client.NewExercise(41, client.ExerciseAttributes{
+				client.Exercise {
+					ID: 41,
 					Title:           "Wide arm pushups",
 					Level:           5,
 					Description:     "put your arms out wide. Push down.",
 					MeasurementType: "REP",
 					CategoryID:      0,
-					TargetSets: []client.SetAttributes{
-						client.SetAttributes{
+					TargetSets: []client.Set {
+						client.Set {
 							SetNumber: 1,
 							Value:     10,
 						},
-						client.SetAttributes{
+						client.Set {
 							SetNumber: 2,
 							Value:     10,
 						},
 					},
 					Quantity: 5,
-				}),
-				*client.NewExercise(24, client.ExerciseAttributes{
+				},
+				client.Exercise{
+					ID: 24,
 					Title:           "Spider man pushups",
 					Level:           10,
 					Description:     "put your arm in front of another. Push down and move forward",
 					MeasurementType: "REP",
 					CategoryID:      0,
-					TargetSets: []client.SetAttributes{
-						client.SetAttributes{
+					TargetSets: []client.Set{
+						client.Set{
 							SetNumber: 1,
 							Value:     30,
 						},
-						client.SetAttributes{
+						client.Set{
 							SetNumber: 2,
 							Value:     30,
 						},
 					},
 					Quantity: 5,
-				}),
+				},
 			},
 			Price: 300,
-		}),
+		},
 	}, nil
 }
 
 func (*ExerciseProductUseCaseImpl) BuyExerciseProduct(userID int, ep client.ExerciseProduct) (*client.Points, error) {
-	return client.NewPoints(4, client.PointsAttributes{
-		Points: 200,
-	}), nil
+	return &client.Points {
+		ID: 4,
+		Value: 200,
+	}, nil
 }
 
 func NewExerciseProductUseCase() *ExerciseProductUseCaseImpl {

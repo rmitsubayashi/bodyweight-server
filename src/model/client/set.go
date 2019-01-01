@@ -1,6 +1,6 @@
 package client
 
-type SetAttributes struct {
+type Set struct {
 	ExerciseID int `json:"exercise_id"`
 	ExerciseTitle string `json:"exercise_title"`
 	MeasurementType string `json:"measurement_type"`

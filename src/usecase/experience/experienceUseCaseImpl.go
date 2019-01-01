@@ -7,43 +7,49 @@ import (
 type ExperienceUseCaseImpl struct{}
 
 func (*ExperienceUseCaseImpl) GetExperienceGraph(userID int) ([]*client.Experience, error) {
-	return []*client.Experience{
-		client.NewExperience(0, client.ExperienceAttributes{
+	return []*client.Experience {
+		&client.Experience {
+			ID: 0,
 			CategoryID:       0,
 			Level:            30,
 			NextLevelCurrent: 233,
 			NextLevelTotal:   300,
-		}),
-		client.NewExperience(1, client.ExperienceAttributes{
+		},
+		&client.Experience {
+			ID: 1,
 			CategoryID:       1,
 			Level:            25,
 			NextLevelCurrent: 120,
 			NextLevelTotal:   200,
-		}),
-		client.NewExperience(2, client.ExperienceAttributes{
+		},
+		&client.Experience {
+			ID: 2,
 			CategoryID:       2,
 			Level:            11,
 			NextLevelCurrent: 34,
 			NextLevelTotal:   50,
-		}),
-		client.NewExperience(3, client.ExperienceAttributes{
+		},
+		&client.Experience {
+			ID: 3,
 			CategoryID:       3,
 			Level:            21,
 			NextLevelCurrent: 140,
 			NextLevelTotal:   150,
-		}),
-		client.NewExperience(4, client.ExperienceAttributes{
+		},
+		&client.Experience {
+			ID: 4,
 			CategoryID:       4,
 			Level:            10,
 			NextLevelCurrent: 1,
 			NextLevelTotal:   45,
-		}),
-		client.NewExperience(5, client.ExperienceAttributes{
+		},
+		&client.Experience {
+			ID: 5,
 			CategoryID:       5,
 			Level:            34,
 			NextLevelCurrent: 0,
 			NextLevelTotal:   375,
-		}),
+		},
 	}, nil
 }
 

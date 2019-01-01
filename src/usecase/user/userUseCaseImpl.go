@@ -7,9 +7,10 @@ import (
 type UserUseCaseImpl struct {}
 
 func (*UserUseCaseImpl) GetUserInfo(userID int) (*client.Points, error) {
-	return client.NewPoints(4, client.PointsAttributes{
-		Points: 200,
-	}), nil
+	return &client.Points {
+		ID: 4,
+		Value: 200,
+	}, nil
 }
 
 func (*UserUseCaseImpl) RegisterNewUser() (error) {
