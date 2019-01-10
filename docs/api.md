@@ -91,6 +91,8 @@ returns Feedback
 
 **after_experience** Experience
 
+**experience_details** Array(ExperienceDetail)
+
 **previous_points** int
 
 **after_points** int
@@ -98,6 +100,11 @@ returns Feedback
 **unlocked_exercises** Array(UnlockedExercise)
 
 **dropped_exercises** Array(ExerciseTitle)
+
+## ExperienceDetail
+**description** string
+
+**experience** int
 
 ## UnlockedExercise
 **exercise** ExerciseTitle
