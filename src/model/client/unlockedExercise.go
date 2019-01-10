@@ -1,7 +1,7 @@
 package client
 
 type UnlockedExercise struct {
-	Exercise       ExerciseTitle   `json:"exercise"`
+	Exercise       Exercise   `json:"exercise"`
 	LevelUnlocked  int             `json:"level_unlocked"`
-	OtherExercises []ExerciseTitle `json:"other_exercises"`
+	OtherExercises []Exercise `json:"other_exercises"`
 }

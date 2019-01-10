@@ -10,5 +10,5 @@ type Feedback struct {
 	PreviousPoints        int                `json:"previous_points"`
 	AfterPoints           int                `json:"after_points"`
 	UnlockedExercises     []UnlockedExercise `json:"unlocked_exercises"`
-	DroppedExercises      []ExerciseTitle    `json:"dropped_exercises"`
+	DroppedExercises      []Exercise  `json:"dropped_exercises"`
 }

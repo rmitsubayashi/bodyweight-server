@@ -99,7 +99,7 @@ returns Feedback
 
 **unlocked_exercises** Array(UnlockedExercise)
 
-**dropped_exercises** Array(ExerciseTitle)
+**dropped_exercises** Array(Exercise)
 
 ## ExperienceDetail
 **description** string
@@ -107,26 +107,15 @@ returns Feedback
 **experience** int
 
 ## UnlockedExercise
-**exercise** ExerciseTitle
+**exercise** Exercise
 
 **level_unlocked** int
 
-**other_exercises** Array(ExerciseTitle)
-
-## ExerciseTitle
-**exercise_id** int
-
-**title** string
+**other_exercises** Array(Exercise)
 
 ## Set
 
-**id** int
-
-**exercise_id** int
-
-**exercise_title** string
-
-**[measurement_type](#measurement-type)** string
+**exercise** Exercise
 
 **set_number** int
 
