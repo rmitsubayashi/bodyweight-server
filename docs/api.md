@@ -95,7 +95,21 @@ returns Feedback
 
 **after_points** int
 
-**unlocked_exercises** Array(Exercise)
+**unlocked_exercises** Array(UnlockedExercise)
+
+**dropped_exercises** Array(ExerciseTitle)
+
+## UnlockedExercise
+**exercise** ExerciseTitle
+
+**level_unlocked** int
+
+**other_exercises** Array(ExerciseTitle)
+
+## ExerciseTitle
+**exercise_id** int
+
+**title** string
 
 ## Set
 
