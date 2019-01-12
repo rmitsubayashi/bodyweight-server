@@ -33,7 +33,7 @@ returns Array(Exercise)
 ### GET /shop/exercises
 returns Array(ExerciseProduct)
 
-### POST /shop/exercises/purchase
+### POST /shop/exercises
 returns points
 
 ## User
