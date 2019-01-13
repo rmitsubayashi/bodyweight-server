@@ -30,6 +30,8 @@ returns Array(Exercise)
 
 **price** int
 
+**sold** boolean
+
 ### GET /shop/exercises
 returns Array(ExerciseProduct)
 

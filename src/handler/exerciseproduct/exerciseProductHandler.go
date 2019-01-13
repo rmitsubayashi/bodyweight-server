@@ -19,7 +19,7 @@ func NewExerciseProductHandler() *ExerciseProductHandler {
 
 func (h *ExerciseProductHandler) GetExerciseProducts(w http.ResponseWriter, r *http.Request) {
 	userID := 1
-	exerciseProducts, err := h.UseCase.GetAvailableExerciseProducts(userID)
+	exerciseProducts, err := h.UseCase.GetTodayExerciseProducts(userID)
 	if err != nil {
 		//TODO split errors
 		util.SendError(w, err, http.StatusInternalServerError)
