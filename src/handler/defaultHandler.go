@@ -1,12 +1,11 @@
 package handler
 
 import (
-	"net/http"
 	"fmt"
+	"net/http"
 )
 
 type DefaultHandler struct {
-
 }
 
 func NewDefaultHandler() *DefaultHandler {
@@ -14,5 +13,5 @@ func NewDefaultHandler() *DefaultHandler {
 }
 
 func (h *DefaultHandler) pong(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "pong!")
+	fmt.Fprint(w, "pong")
 }
