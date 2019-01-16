@@ -2,6 +2,7 @@ package exerciseproduct
 
 import (
 	"net/http"
+
 	"github.com/rmitsubayashi/bodyweight-server/src/handler/util"
 	"github.com/rmitsubayashi/bodyweight-server/src/model/client"
 	usecase "github.com/rmitsubayashi/bodyweight-server/src/usecase/exerciseProduct"
@@ -37,11 +38,11 @@ func (h *ExerciseProductHandler) PostExerciseProduct(w http.ResponseWriter, r *h
 		return
 	}
 	userID := 1
-	points, err := h.UseCase.BuyExerciseProduct(userID, ep)
+	err = h.UseCase.BuyExerciseProduct(userID, ep)
 	if err != nil {
 		util.SendError(w, err, http.StatusInternalServerError)
 		return
 	}
 
-	util.SendData(w, points)
+	util.SendData(w, nil)
 }

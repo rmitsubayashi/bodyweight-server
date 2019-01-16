@@ -174,11 +174,8 @@ func (*ExerciseProductUseCaseImpl) GetTodayExerciseProducts(userID int) ([]*clie
 	}, nil
 }
 
-func (*ExerciseProductUseCaseImpl) BuyExerciseProduct(userID int, ep client.ExerciseProduct) (*client.Points, error) {
-	return &client.Points {
-		ID: 4,
-		Value: 200,
-	}, nil
+func (*ExerciseProductUseCaseImpl) BuyExerciseProduct(userID int, ep client.ExerciseProduct)  error {
+	return nil
 }
 
 func NewExerciseProductUseCase() *ExerciseProductUseCaseImpl {

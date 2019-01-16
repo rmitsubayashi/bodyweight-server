@@ -6,5 +6,5 @@ import (
 
 type ExerciseProductUseCase interface {
 	GetTodayExerciseProducts(userID int) ([]*client.ExerciseProduct, error)
-	BuyExerciseProduct(userID int, ep client.ExerciseProduct) (*client.Points, error)
+	BuyExerciseProduct(userID int, ep client.ExerciseProduct) error
 }
