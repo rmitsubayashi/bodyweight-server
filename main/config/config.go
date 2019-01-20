@@ -14,19 +14,19 @@ type DB struct {
 	Username string
 	Password string
 	Instance string
+	Schema   string
 }
 
 var (
 	config *Config
 )
 
-func NewConfig() *Config {
+func NewConfig() (*Config, error) {
 	if config == nil {
 		config = &Config{}
-		err := envconfig.Process("config", config)
-		if err != nil {
-			fmt.Printf("%+v", err)
+		if err := envconfig.Process("config", config); err != nil {
+			return nil, fmt.Errorf("could not read env: %v",err)
 		}
 	}
-	return config
+	return config, nil
 }

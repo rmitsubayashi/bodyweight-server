@@ -3,6 +3,7 @@ package exercise
 import (
 	"net/http"
 	"strconv"
+
 	"github.com/rmitsubayashi/bodyweight-server/src/handler/util"
 	usecase "github.com/rmitsubayashi/bodyweight-server/src/usecase/exercise"
 )

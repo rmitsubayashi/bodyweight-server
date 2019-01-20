@@ -11,22 +11,30 @@ import (
 	"github.com/rmitsubayashi/bodyweight-server/src/handler/user"
 )
 
-type RouterImpl struct{}
+type RouterImpl struct{
+}
 
 func NewRouter() *RouterImpl {
-	return &RouterImpl{}
+	return &RouterImpl{
+	}
 }
 func (ri *RouterImpl) Route() {
 	r := mux.NewRouter()
+	exerciseH := exercise.NewExerciseHandler()
+	logH := log.NewLogHandler()
+	exerciseProductH := exerciseproduct.NewExerciseProductHandler()
+	experienceH := experience.NewExperienceHandler()
+	userH := user.NewUserHandler()
+
 	r.HandleFunc("/", NewDefaultHandler().pong).Methods(http.MethodGet)
-	r.HandleFunc("/users/exercises", exercise.NewExerciseHandler().GetExercises).Methods(http.MethodGet)
-	r.HandleFunc("/users/logs", log.NewLogHandler().GetLogs).Methods(http.MethodGet)
-	r.HandleFunc("/users/logs/{log_id}", log.NewLogHandler().GetLog).Methods(http.MethodGet)
-	r.HandleFunc("/users/logs", log.NewLogHandler().PostLog).Methods(http.MethodPost)
-	r.HandleFunc("/shop/exercises", exerciseproduct.NewExerciseProductHandler().GetExerciseProducts).Methods(http.MethodGet)
-	r.HandleFunc("/shop/exercises", exerciseproduct.NewExerciseProductHandler().PostExerciseProduct).Methods(http.MethodPost)
-	r.HandleFunc("/users/experiences", experience.NewExperienceHandler().GetExperiences).Methods(http.MethodGet)
-	r.HandleFunc("/users", user.NewUserHandler().GetUser).Methods(http.MethodGet)
-	r.HandleFunc("/users", user.NewUserHandler().PostUser).Methods(http.MethodPost)
+	r.HandleFunc("/users/exercises", exerciseH.GetExercises).Methods(http.MethodGet)
+	r.HandleFunc("/users/logs", logH.GetLogs).Methods(http.MethodGet)
+	r.HandleFunc("/users/logs/{log_id}", logH.GetLog).Methods(http.MethodGet)
+	r.HandleFunc("/users/logs", logH.PostLog).Methods(http.MethodPost)
+	r.HandleFunc("/shop/exercises", exerciseProductH.GetExerciseProducts).Methods(http.MethodGet)
+	r.HandleFunc("/shop/exercises", exerciseproductH.PostExerciseProduct).Methods(http.MethodPost)
+	r.HandleFunc("/users/experiences", experienceH.GetExperiences).Methods(http.MethodGet)
+	r.HandleFunc("/users", userH.GetUser).Methods(http.MethodGet)
+	r.HandleFunc("/users", userH.PostUser).Methods(http.MethodPost)
 	http.Handle("/", r)
 }

@@ -2,3 +2,4 @@ env_variables:
   CONFIG_DB_USERNAME: "root"
   CONFIG_DB_PASSWORD: "28Ju3OG7L6uIajvM"
   CONFIG_DB_INSTANCE: "bodyweight-server:asia-northeast1:bodyweight-db"
+  CONFIG_DB_SCHEMA: "schema"

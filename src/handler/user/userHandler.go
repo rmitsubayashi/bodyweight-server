@@ -2,6 +2,7 @@ package user
 
 import (
 	"net/http"
+
 	"github.com/rmitsubayashi/bodyweight-server/src/handler/util"
 	usecase "github.com/rmitsubayashi/bodyweight-server/src/usecase/user"
 )
