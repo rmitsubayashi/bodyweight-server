@@ -4,22 +4,19 @@ import (
 	"database/sql"
 	"fmt"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/rmitsubayashi/bodyweight-server/main/config"
 	"google.golang.org/appengine"
 )
 
-type DB struct {
-	conn *sql.DB
-}
-
 var (
-	db  *DB
-	err error
+	conn *sql.DB
+	err  error
 )
 
-func NewDBConnection() (*DB, error) {
-	if db != nil || err != nil {
-		return db, err
+func NewDBConnection() (*sql.DB, error) {
+	if conn != nil || err != nil {
+		return conn, err
 	}
 
 	cfg, err := config.NewConfig()
@@ -34,12 +31,7 @@ func NewDBConnection() (*DB, error) {
 		conn.Close()
 		return nil, fmt.Errorf("could not establish good connection: %v", err)
 	}
-
-	db := &DB{
-		conn: conn,
-	}
-	err = nil
-	return db, nil
+	return conn, nil
 }
 
 func formatConnectionString(cfg *config.Config) string {

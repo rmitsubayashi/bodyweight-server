@@ -11,10 +11,14 @@ type UserHandler struct {
 	UseCase usecase.UserUseCase
 }
 
-func NewUserHandler() *UserHandler {
-	return &UserHandler{
-		UseCase: usecase.NewUserUseCase(),
+func NewUserHandler() (*UserHandler, error) {
+	uc, err := usecase.NewUserUseCase()
+	if err != nil {
+		return nil, err
 	}
+	return &UserHandler{
+		UseCase: uc,
+	}, nil
 }
 
 func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {

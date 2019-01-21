@@ -1,23 +1,41 @@
 package user
 
 import (
+	"database/sql"
+	"fmt"
+
 	"github.com/rmitsubayashi/bodyweight-server/src/repository"
 )
 
 type UserRepoImpl struct {
-	db repository.DB
+	conn *sql.DB
 }
 
-func (*UserRepoImpl) AddUser() error {
+func (ur *UserRepoImpl) AddUser() error {
+	statement := `
+	INSERT INTO user (
+		firebaseuid
+	) VALUES (?)
+	`
+	preparedSt, err := ur.conn.Prepare(statement)
+	if err != nil {
+		return err
+	}
+	result, err := preparedSt.Exec("firebaseuid")
+	if err != nil {
+		return err
+	}
 
+	fmt.Printf("returned user: %v", result)
+	return nil
 }
 
 func NewUserRepo() (*UserRepoImpl, error) {
-	db, err := repository.NewDBConnection(cfg)
+	conn, err := repository.NewDBConnection()
 	if err != nil {
 		return nil, err
 	}
 	return &UserRepoImpl{
-		db: db,
+		conn: conn,
 	}, nil
 }

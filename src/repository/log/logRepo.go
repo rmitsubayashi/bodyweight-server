@@ -5,5 +5,5 @@ import (
 )
 
 type LogRepo interface {
-	GetUserLogs(userID int) ([]server.Log, error)
+	GetUserLogs(userID int) (*[]server.Log, error)
 }

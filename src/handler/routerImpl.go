@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -11,12 +12,11 @@ import (
 	"github.com/rmitsubayashi/bodyweight-server/src/handler/user"
 )
 
-type RouterImpl struct{
+type RouterImpl struct {
 }
 
 func NewRouter() *RouterImpl {
-	return &RouterImpl{
-	}
+	return &RouterImpl{}
 }
 func (ri *RouterImpl) Route() {
 	r := mux.NewRouter()
@@ -24,7 +24,10 @@ func (ri *RouterImpl) Route() {
 	logH := log.NewLogHandler()
 	exerciseProductH := exerciseproduct.NewExerciseProductHandler()
 	experienceH := experience.NewExperienceHandler()
-	userH := user.NewUserHandler()
+	userH, err := user.NewUserHandler()
+	if err != nil {
+		fmt.Printf(err.Error())
+	}
 
 	r.HandleFunc("/", NewDefaultHandler().pong).Methods(http.MethodGet)
 	r.HandleFunc("/users/exercises", exerciseH.GetExercises).Methods(http.MethodGet)
@@ -32,7 +35,7 @@ func (ri *RouterImpl) Route() {
 	r.HandleFunc("/users/logs/{log_id}", logH.GetLog).Methods(http.MethodGet)
 	r.HandleFunc("/users/logs", logH.PostLog).Methods(http.MethodPost)
 	r.HandleFunc("/shop/exercises", exerciseProductH.GetExerciseProducts).Methods(http.MethodGet)
-	r.HandleFunc("/shop/exercises", exerciseproductH.PostExerciseProduct).Methods(http.MethodPost)
+	r.HandleFunc("/shop/exercises", exerciseProductH.PostExerciseProduct).Methods(http.MethodPost)
 	r.HandleFunc("/users/experiences", experienceH.GetExperiences).Methods(http.MethodGet)
 	r.HandleFunc("/users", userH.GetUser).Methods(http.MethodGet)
 	r.HandleFunc("/users", userH.PostUser).Methods(http.MethodPost)
