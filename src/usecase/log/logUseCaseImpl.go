@@ -64,30 +64,8 @@ func (uc *LogUseCaseImpl) generateFeedback(log client.Log) client.Feedback {
 		CommentHighlightSpans: [][2]int{
 			[2]int{21, 31},
 		},
-		PreviousExperience: client.Experience{
-			CategoryID:       0,
-			Level:            19,
-			NextLevelCurrent: 210,
-			NextLevelTotal:   300,
-		},
-		AfterExperience: client.Experience{
-			CategoryID:       0,
-			Level:            20,
-			NextLevelCurrent: 10,
-			NextLevelTotal:   310,
-		},
 		PreviousPoints: 2300,
 		AfterPoints:    2400,
-		ExperienceDetails: []client.ExperienceDetail{
-			client.ExperienceDetail{
-				Description: "pushups x 6",
-				Experience:  40,
-			},
-			client.ExperienceDetail{
-				Description: " one arm pushup x 1",
-				Experience:  60,
-			},
-		},
 		UnlockedExercises: []client.UnlockedExercise{
 			client.UnlockedExercise{
 				Exercise: client.Exercise{

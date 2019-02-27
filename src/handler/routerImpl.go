@@ -7,7 +7,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/rmitsubayashi/bodyweight-server/src/handler/exercise"
 	"github.com/rmitsubayashi/bodyweight-server/src/handler/exerciseproduct"
-	"github.com/rmitsubayashi/bodyweight-server/src/handler/experience"
 	"github.com/rmitsubayashi/bodyweight-server/src/handler/log"
 	"github.com/rmitsubayashi/bodyweight-server/src/handler/user"
 )
@@ -32,7 +31,6 @@ func (ri *RouterImpl) Route() {
 	if err != nil {
 		fmt.Printf(err.Error())
 	}
-	experienceH := experience.NewExperienceHandler()
 	userH, err := user.NewUserHandler()
 	if err != nil {
 		fmt.Printf(err.Error())
@@ -45,7 +43,6 @@ func (ri *RouterImpl) Route() {
 	r.HandleFunc("/users/logs", logH.PostLog).Methods(http.MethodPost)
 	r.HandleFunc("/shop/exercises", exerciseProductH.GetExerciseProducts).Methods(http.MethodGet)
 	r.HandleFunc("/shop/exercises", exerciseProductH.PostExerciseProduct).Methods(http.MethodPost)
-	r.HandleFunc("/users/experiences", experienceH.GetExperiences).Methods(http.MethodGet)
 	r.HandleFunc("/users", userH.GetUser).Methods(http.MethodGet)
 	r.HandleFunc("/users", userH.PostUser).Methods(http.MethodPost)
 	http.Handle("/", r)
