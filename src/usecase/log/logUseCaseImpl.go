@@ -53,7 +53,12 @@ func (uc *LogUseCaseImpl) RecordLog(log client.Log) (*client.Feedback, error) {
 		return nil, err
 	}
 
-	return &client.Feedback{
+	feedback := uc.generateFeedback(log)
+	return &feedback, nil
+}
+
+func (uc *LogUseCaseImpl) generateFeedback(log client.Log) client.Feedback {
+	return client.Feedback{
 		ID:      2,
 		Comment: "Great job doing your first ever one arm pushup! You're definitely getting stronger!",
 		CommentHighlightSpans: [][2]int{
@@ -116,7 +121,7 @@ func (uc *LogUseCaseImpl) RecordLog(log client.Log) (*client.Feedback, error) {
 				Level:      5,
 			},
 		},
-	}, nil
+	}
 }
 
 func NewLogUseCase() (*LogUseCaseImpl, error) {
