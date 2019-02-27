@@ -6,4 +6,6 @@ import (
 
 type LogRepo interface {
 	GetUserLogs(userID int) (*[]server.Log, error)
+	GetUserLog(logID int) (*server.Log, error)
+	AddLog(log server.Log) error
 }

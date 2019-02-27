@@ -1,6 +1,8 @@
 package log
 
 import (
+	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -14,10 +16,14 @@ type LogHandler struct {
 	UseCase usecase.LogUseCase
 }
 
-func NewLogHandler() *LogHandler {
-	return &LogHandler{
-		UseCase: usecase.NewLogUseCase(),
+func NewLogHandler() (*LogHandler, error) {
+	uc, err := usecase.NewLogUseCase()
+	if err != nil {
+		return nil, err
 	}
+	return &LogHandler{
+		UseCase: uc,
+	}, nil
 }
 
 func (h *LogHandler) GetLogs(w http.ResponseWriter, r *http.Request) {
@@ -52,10 +58,15 @@ func (h *LogHandler) GetLog(w http.ResponseWriter, r *http.Request) {
 
 func (h *LogHandler) PostLog(w http.ResponseWriter, r *http.Request) {
 	var l client.Log
-	err := util.GetData(r, l)
+	err := json.NewDecoder(r.Body).Decode(&l)
 	if err != nil {
 		//TOTO split errors
 		util.SendError(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	if len(l.Sets) == 0 {
+		util.SendError(w, errors.New("no sets"), http.StatusBadRequest)
 		return
 	}
 	feedback, err := h.UseCase.RecordLog(l)

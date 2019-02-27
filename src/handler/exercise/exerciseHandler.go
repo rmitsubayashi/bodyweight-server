@@ -12,10 +12,14 @@ type ExerciseHandler struct {
 	UseCase usecase.ExerciseUseCase
 }
 
-func NewExerciseHandler() *ExerciseHandler {
-	return &ExerciseHandler{
-		UseCase: usecase.NewExerciseUseCase(),
+func NewExerciseHandler() (*ExerciseHandler, error) {
+	uc, err := usecase.NewExerciseUseCase()
+	if err != nil {
+		return nil, err
 	}
+	return &ExerciseHandler{
+		UseCase: uc,
+	}, nil
 }
 
 func (h *ExerciseHandler) GetExercises(w http.ResponseWriter, r *http.Request) {

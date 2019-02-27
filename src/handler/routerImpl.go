@@ -20,9 +20,18 @@ func NewRouter() *RouterImpl {
 }
 func (ri *RouterImpl) Route() {
 	r := mux.NewRouter()
-	exerciseH := exercise.NewExerciseHandler()
-	logH := log.NewLogHandler()
-	exerciseProductH := exerciseproduct.NewExerciseProductHandler()
+	exerciseH, err := exercise.NewExerciseHandler()
+	if err != nil {
+		fmt.Printf(err.Error())
+	}
+	logH, err := log.NewLogHandler()
+	if err != nil {
+		fmt.Printf(err.Error())
+	}
+	exerciseProductH, err := exerciseproduct.NewExerciseProductHandler()
+	if err != nil {
+		fmt.Printf(err.Error())
+	}
 	experienceH := experience.NewExperienceHandler()
 	userH, err := user.NewUserHandler()
 	if err != nil {

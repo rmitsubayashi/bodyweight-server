@@ -1,8 +1,9 @@
 package repository
 
 import (
-	"database/sql"
 	"fmt"
+
+	"github.com/jmoiron/sqlx"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/rmitsubayashi/bodyweight-server/main/config"
@@ -10,11 +11,11 @@ import (
 )
 
 var (
-	conn *sql.DB
+	conn *sqlx.DB
 	err  error
 )
 
-func NewDBConnection() (*sql.DB, error) {
+func NewDBConnection() (*sqlx.DB, error) {
 	if conn != nil || err != nil {
 		return conn, err
 	}
@@ -23,7 +24,7 @@ func NewDBConnection() (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	conn, err := sql.Open("mysql", formatConnectionString(cfg))
+	conn, err := sqlx.Open("mysql", formatConnectionString(cfg))
 	if err != nil {
 		return nil, fmt.Errorf("could not get connection %v", err)
 	}
@@ -46,9 +47,10 @@ func formatConnectionString(cfg *config.Config) string {
 		cred = cred + "@"
 	}
 
+	timeMapping := "?parseTime=true"
 	if appengine.IsDevAppServer() {
-		return fmt.Sprintf("%stcp([%s]:%d)/%s", cred, "localhost", 3306, cfg.DB.Schema)
+		return fmt.Sprintf("%stcp([%s]:%d)/%s%s", cred, "localhost", 3306, cfg.DB.Schema, timeMapping)
 	}
 
-	return fmt.Sprintf("%sunix(/cloudsql/%s)/%s", cred, cfg.DB.Instance, cfg.DB.Schema)
+	return fmt.Sprintf("%sunix(/cloudsql/%s)/%s%s", cred, cfg.DB.Instance, cfg.DB.Schema, timeMapping)
 }

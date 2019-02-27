@@ -1,9 +1,9 @@
 package util
 
 import (
-	"net/http"
-	"errors"
 	"encoding/json"
+	"errors"
+	"net/http"
 )
 
 func GetQueryParam(r *http.Request, key string) (string, error) {
@@ -21,18 +21,18 @@ type JSONErrors struct {
 }
 
 type JSONError struct {
-	Status int `json:"status"`
-	Code int `json:"code"`
-	Title string `json:"title"`
+	Status  int    `json:"status"`
+	Code    int    `json:"code"`
+	Title   string `json:"title"`
 	Details string `json:"details"`
 }
 
 func SendError(w http.ResponseWriter, err error, status int) {
-	errorStruct := JSONErrors {
-		Errors: []JSONError {
-			JSONError {
+	errorStruct := JSONErrors{
+		Errors: []JSONError{
+			JSONError{
 				Status: status,
-				Title: err.Error(),
+				Title:  err.Error(),
 			},
 		},
 	}
@@ -46,7 +46,7 @@ type Data struct {
 }
 
 func SendData(w http.ResponseWriter, obj interface{}) {
-	dataStruct := Data {
+	dataStruct := Data{
 		Data: obj,
 	}
 	json.NewEncoder(w).Encode(dataStruct)

@@ -2,107 +2,57 @@ package log
 
 import (
 	"github.com/rmitsubayashi/bodyweight-server/src/model/client"
+	er "github.com/rmitsubayashi/bodyweight-server/src/repository/exercise"
+	lr "github.com/rmitsubayashi/bodyweight-server/src/repository/log"
 )
 
-type LogUseCaseImpl struct{}
+type LogUseCaseImpl struct {
+	logRepo      lr.LogRepo
+	exerciseRepo er.ExerciseRepo
+}
 
 func (uc *LogUseCaseImpl) GetLogList(userID int) ([]*client.Log, error) {
-	return []*client.Log{
-		&client.Log{
-			ID:         1,
-			CategoryID: 0,
-			Date:       "2018-12-29",
-			Sets: []client.Set{
-				client.Set{
-					Exercise: client.Exercise{
-						ID:              21,
-						Title:           "One arm pushups",
-						MeasurementType: "REP",
-					},
-					SetNumber: 1,
-					Value:     1,
-				},
-				client.Set{
-					Exercise: client.Exercise{
-						ID:              20,
-						Title:           "Half one-arm pushups",
-						MeasurementType: "REP",
-					},
-					SetNumber: 2,
-					Value:     13,
-				},
-				client.Set{
-					Exercise: client.Exercise{
-						ID:              20,
-						Title:           "Half one-arm pushups",
-						MeasurementType: "REP",
-					},
-					SetNumber: 3,
-					Value:     4,
-				},
-			},
-			Memo: "Did my first fucking one arm pushup!!!",
-		},
+	serverLogs, err := uc.logRepo.GetUserLogs(userID)
+	if err != nil {
+		return nil, err
+	}
 
-		&client.Log{
-			ID:         1,
-			CategoryID: 0,
-			Date:       "2018-12-31",
-			Sets: []client.Set{
-				client.Set{
-					Exercise: client.Exercise{
-						ID:              21,
-						Title:           "One arm pushups",
-						MeasurementType: "REP",
-					},
-					SetNumber: 1,
-					Value:     2,
-				},
-				client.Set{
-					Exercise: client.Exercise{
-						ID:              20,
-						Title:           "Half one-arm pushups",
-						MeasurementType: "REP",
-					},
-					SetNumber: 2,
-					Value:     12,
-				},
-			},
-			Memo: "Did two fucking one arm pushups!!!",
-		},
-	}, nil
+	var clientLogs []*client.Log
+	for _, serverLog := range *serverLogs {
+		clientLog := serverToClientLog(serverLog)
+		clientLogs = append(clientLogs, &clientLog)
+	}
+
+	return clientLogs, nil
+
 }
 
 func (uc *LogUseCaseImpl) GetLogInfo(logID int) (*client.Log, error) {
-	return &client.Log{
-		ID:         logID,
-		CategoryID: 0,
-		Date:       "2018-12-31",
-		Sets: []client.Set{
-			client.Set{
-				Exercise: client.Exercise{
-					ID:              21,
-					Title:           "One arm pushups",
-					MeasurementType: "REP",
-				},
-				SetNumber: 1,
-				Value:     2,
-			},
-			client.Set{
-				Exercise: client.Exercise{
-					ID:              20,
-					Title:           "Half one-arm pushups",
-					MeasurementType: "REP",
-				},
-				SetNumber: 2,
-				Value:     12,
-			},
-		},
-		Memo: "Did two fucking one arm pushups!!!",
-	}, nil
+	serverLog, err := uc.logRepo.GetUserLog(logID)
+	if err != nil {
+		return nil, err
+	}
+	//the server log only has an exercise ID so we need to fetch the exercise
+	var clientSets []client.Set
+	for _, set := range serverLog.Sets {
+		exercise, err := uc.exerciseRepo.GetExercise(set.ExerciseID)
+		if err != nil {
+			return nil, err
+		}
+
+		clientSet := serverToClientSet(set, *exercise)
+		clientSets = append(clientSets, clientSet)
+	}
+	clientLog := serverToClientLogWithExerciseDetails(*serverLog, clientSets)
+	return &clientLog, nil
 }
 
 func (uc *LogUseCaseImpl) RecordLog(log client.Log) (*client.Feedback, error) {
+	logForServer := clientToServerLog(log)
+	if err := uc.logRepo.AddLog(logForServer); err != nil {
+		return nil, err
+	}
+
 	return &client.Feedback{
 		ID:      2,
 		Comment: "Great job doing your first ever one arm pushup! You're definitely getting stronger!",
@@ -169,6 +119,18 @@ func (uc *LogUseCaseImpl) RecordLog(log client.Log) (*client.Feedback, error) {
 	}, nil
 }
 
-func NewLogUseCase() *LogUseCaseImpl {
-	return &LogUseCaseImpl{}
+func NewLogUseCase() (*LogUseCaseImpl, error) {
+	logRepo, err := lr.NewLogRepo()
+	if err != nil {
+		return nil, err
+	}
+
+	exerRepo, err := er.NewExerciseRepo()
+	if err != nil {
+		return nil, err
+	}
+	return &LogUseCaseImpl{
+		logRepo:      logRepo,
+		exerciseRepo: exerRepo,
+	}, nil
 }

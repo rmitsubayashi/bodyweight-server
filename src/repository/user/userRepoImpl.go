@@ -1,14 +1,15 @@
 package user
 
 import (
-	"database/sql"
 	"fmt"
+
+	"github.com/jmoiron/sqlx"
 
 	"github.com/rmitsubayashi/bodyweight-server/src/repository"
 )
 
 type UserRepoImpl struct {
-	conn *sql.DB
+	conn *sqlx.DB
 }
 
 func (ur *UserRepoImpl) AddUser() error {
@@ -17,11 +18,7 @@ func (ur *UserRepoImpl) AddUser() error {
 		firebaseuid
 	) VALUES (?)
 	`
-	preparedSt, err := ur.conn.Prepare(statement)
-	if err != nil {
-		return err
-	}
-	result, err := preparedSt.Exec("firebaseuid")
+	result, err := ur.conn.Exec(statement, "firebaseuid")
 	if err != nil {
 		return err
 	}

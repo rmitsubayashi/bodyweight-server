@@ -1,6 +1,7 @@
 package exerciseproduct
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/rmitsubayashi/bodyweight-server/src/handler/util"
@@ -12,10 +13,14 @@ type ExerciseProductHandler struct {
 	UseCase usecase.ExerciseProductUseCase
 }
 
-func NewExerciseProductHandler() *ExerciseProductHandler {
-	return &ExerciseProductHandler{
-		UseCase: usecase.NewExerciseProductUseCase(),
+func NewExerciseProductHandler() (*ExerciseProductHandler, error) {
+	uc, err := usecase.NewExerciseProductUseCase()
+	if err != nil {
+		return nil, err
 	}
+	return &ExerciseProductHandler{
+		UseCase: uc,
+	}, nil
 }
 
 func (h *ExerciseProductHandler) GetExerciseProducts(w http.ResponseWriter, r *http.Request) {
@@ -32,7 +37,7 @@ func (h *ExerciseProductHandler) GetExerciseProducts(w http.ResponseWriter, r *h
 
 func (h *ExerciseProductHandler) PostExerciseProduct(w http.ResponseWriter, r *http.Request) {
 	var ep client.ExerciseProduct
-	err := util.GetData(r, ep)
+	err := json.NewDecoder(r.Body).Decode(&ep)
 	if err != nil {
 		util.SendError(w, err, http.StatusBadRequest)
 		return
