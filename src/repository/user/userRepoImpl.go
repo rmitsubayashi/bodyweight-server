@@ -5,6 +5,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
+	"github.com/rmitsubayashi/bodyweight-server/src/model/server"
 	"github.com/rmitsubayashi/bodyweight-server/src/repository"
 )
 
@@ -25,6 +26,17 @@ func (ur *UserRepoImpl) AddUser() error {
 
 	fmt.Printf("returned user: %v", result)
 	return nil
+}
+
+func (ur *UserRepoImpl) GetUser(uid int) (*server.User, error) {
+	getUserStatement := `
+	SELECT * FROM user
+	WHERE id=?
+	`
+	var user server.User
+	err := ur.conn.Get(&user, getUserStatement, uid)
+
+	return &user, err
 }
 
 func NewUserRepo() (*UserRepoImpl, error) {

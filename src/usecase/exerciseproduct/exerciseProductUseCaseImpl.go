@@ -1,181 +1,77 @@
 package exerciseproduct
 
 import (
+	"errors"
+	"math/rand"
+	"time"
+
 	"github.com/rmitsubayashi/bodyweight-server/src/model/client"
 	er "github.com/rmitsubayashi/bodyweight-server/src/repository/exercise"
+	tr "github.com/rmitsubayashi/bodyweight-server/src/repository/transaction"
 	ur "github.com/rmitsubayashi/bodyweight-server/src/repository/user"
+	"github.com/rmitsubayashi/bodyweight-server/src/usecase/util"
 )
 
 type ExerciseProductUseCaseImpl struct {
-	exerciseRepo er.ExerciseRepo
-	userRepo     ur.UserRepo
+	exerciseRepo    er.ExerciseRepo
+	transactionRepo tr.TransactionRepo
+	userRepo        ur.UserRepo
 }
 
-func (*ExerciseProductUseCaseImpl) GetTodayExerciseProducts(userID int) ([]*client.ExerciseProduct, error) {
-	return []*client.ExerciseProduct{
-		&client.ExerciseProduct{
-			ID:    2,
-			Title: "Hand stands",
-			Exercises: []client.Exercise{
-				client.Exercise{
-					ID:              42,
-					Title:           "Hand stand pushups",
-					Level:           9,
-					Description:     "Balance yourself on a wall. Push up",
-					MeasurementType: "SECONDS",
-					CategoryID:      0,
-					TargetSets: []client.Set{
-						client.Set{
-							SetNumber: 1,
-							Value:     10,
-						},
-						client.Set{
-							SetNumber: 2,
-							Value:     10,
-						},
-					},
-					Quantity: 5,
-				},
-			},
-			Price: 300,
-			Sold:  false,
-		},
-		&client.ExerciseProduct{
-			ID:    2,
-			Title: "Wide arm pushups",
-			Exercises: []client.Exercise{
-				client.Exercise{
-					ID:              41,
-					Title:           "Wide arm pushups",
-					Level:           5,
-					Description:     "put your arms out wide. Push down.",
-					MeasurementType: "REP",
-					CategoryID:      1,
-					TargetSets: []client.Set{
-						client.Set{
-							SetNumber: 1,
-							Value:     10,
-						},
-						client.Set{
-							SetNumber: 2,
-							Value:     10,
-						},
-					},
-					Quantity: 5,
-				},
-			},
-			Price: 300,
-			Sold:  true,
-		},
-		&client.ExerciseProduct{
-			ID:    22,
-			Title: "wide arm pull ups",
-			Exercises: []client.Exercise{
-				client.Exercise{
-					ID:              41,
-					Title:           "Wide arm pull ups",
-					Level:           6,
-					Description:     "put your arms out wide. Pull up.",
-					MeasurementType: "REP",
-					CategoryID:      2,
-					TargetSets: []client.Set{
-						client.Set{
-							SetNumber: 1,
-							Value:     10,
-						},
-						client.Set{
-							SetNumber: 2,
-							Value:     10,
-						},
-					},
-					Quantity: 5,
-				},
-			},
-			Price: 300,
-			Sold:  true,
-		},
-		&client.ExerciseProduct{
-			ID:    12,
-			Title: "front lever",
-			Exercises: []client.Exercise{
-				client.Exercise{
-					ID:              41,
-					Title:           "front lever",
-					Level:           10,
-					Description:     "hold the bar. Lift up.",
-					MeasurementType: "SECONDS",
-					CategoryID:      3,
-					TargetSets: []client.Set{
-						client.Set{
-							SetNumber: 1,
-							Value:     10,
-						},
-						client.Set{
-							SetNumber: 2,
-							Value:     10,
-						},
-					},
-					Quantity: 3,
-				},
-			},
-			Price: 200,
-			Sold:  false,
-		},
-		&client.ExerciseProduct{
-			ID:    2,
-			Title: "Assisted one legged squats",
-			Exercises: []client.Exercise{
-				client.Exercise{
-					ID:              41,
-					Title:           "Assisted one legged squats",
-					Level:           7,
-					Description:     "Hold on to a door. Push down",
-					MeasurementType: "REP",
-					CategoryID:      4,
-					TargetSets: []client.Set{
-						client.Set{
-							SetNumber: 1,
-							Value:     10,
-						},
-						client.Set{
-							SetNumber: 2,
-							Value:     10,
-						},
-					},
-					Quantity: 1,
-				},
-			},
-			Price: 100,
-			Sold:  false,
-		},
-		&client.ExerciseProduct{
-			ID:    2,
-			Title: "Leg raises",
-			Exercises: []client.Exercise{
-				client.Exercise{
-					ID:              41,
-					Title:           "Leg raises",
-					Level:           5,
-					Description:     "Lie down. Lift up your legs.",
-					MeasurementType: "REP",
-					CategoryID:      5,
-					TargetSets: []client.Set{
-						client.Set{
-							SetNumber: 1,
-							Value:     10,
-						},
-						client.Set{
-							SetNumber: 2,
-							Value:     10,
-						},
-					},
-					Quantity: 5,
-				},
-			},
-			Price: 300,
-			Sold:  false,
-		},
-	}, nil
+func (uc *ExerciseProductUseCaseImpl) GetTodayExerciseProducts(userID int) (*[]client.ExerciseProduct, error) {
+	u, err := uc.userRepo.GetUser(userID)
+	if err != nil {
+		return nil, err
+	}
+	catLevels := u.GetCatLevels()
+	var eps []client.ExerciseProduct
+	for index, level := range catLevels {
+		minLev, maxLev := calculateMinMaxLevel(level)
+		catLevel := index + 1
+		seed := util.FormatDateSeed()
+		userSeed := seed + userID
+		rowCt := 1
+		exercisesPtr, err := uc.exerciseRepo.FindRandomExercise(catLevel, minLev, maxLev, userSeed, rowCt)
+		if err != nil {
+			return nil, err
+		}
+		exercises := *exercisesPtr
+		if len(exercises) == 0 {
+			continue
+		}
+		rand.Seed(int64(userSeed))
+		amount := rand.Intn(2) + 1
+		price := exercises[0].Level * amount * 100
+		for i := 1; i < amount; i++ {
+			exercises = append(exercises, exercises[0])
+		}
+
+		title := exercises[0].Title
+
+		// using ep here just to make st (one less function to write :P)
+		ep := serverExercisesToClientExerciseProduct(exercises, title, price, false)
+		st := clientExerciseProductToServerTransaction(ep, userID)
+		sold, err := uc.transactionRepo.TransactionExists(st, time.Now())
+		if err != nil {
+			return nil, errors.New(err.Error())
+		}
+		ep = serverExercisesToClientExerciseProduct(exercises, title, price, sold)
+
+		eps = append(eps, ep)
+	}
+
+	return &eps, nil
+}
+
+func calculateMinMaxLevel(lvl int) (int, int) {
+	var min int
+	if lvl == 1 {
+		min = 1
+	} else {
+		min = lvl - 1
+	}
+	max := lvl
+	return min, max
 }
 
 func (uc *ExerciseProductUseCaseImpl) BuyExerciseProduct(userID int, ep client.ExerciseProduct) error {
@@ -186,11 +82,18 @@ func (uc *ExerciseProductUseCaseImpl) BuyExerciseProduct(userID int, ep client.E
 		}
 	}
 
-	return nil
+	t := clientExerciseProductToServerTransaction(ep, userID)
+	err := uc.transactionRepo.AddTransaction(t)
+
+	return err
 }
 
 func NewExerciseProductUseCase() (*ExerciseProductUseCaseImpl, error) {
 	exerRepo, err := er.NewExerciseRepo()
+	if err != nil {
+		return nil, err
+	}
+	tRepo, err := tr.NewTransactionRepo()
 	if err != nil {
 		return nil, err
 	}
@@ -199,7 +102,8 @@ func NewExerciseProductUseCase() (*ExerciseProductUseCaseImpl, error) {
 		return nil, err
 	}
 	return &ExerciseProductUseCaseImpl{
-		exerciseRepo: exerRepo,
-		userRepo:     uRepo,
+		exerciseRepo:    exerRepo,
+		transactionRepo: tRepo,
+		userRepo:        uRepo,
 	}, nil
 }

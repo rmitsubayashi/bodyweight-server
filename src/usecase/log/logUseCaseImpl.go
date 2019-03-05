@@ -4,11 +4,13 @@ import (
 	"github.com/rmitsubayashi/bodyweight-server/src/model/client"
 	er "github.com/rmitsubayashi/bodyweight-server/src/repository/exercise"
 	lr "github.com/rmitsubayashi/bodyweight-server/src/repository/log"
+	ur "github.com/rmitsubayashi/bodyweight-server/src/repository/user"
 )
 
 type LogUseCaseImpl struct {
 	logRepo      lr.LogRepo
 	exerciseRepo er.ExerciseRepo
+	userRepo     ur.UserRepo
 }
 
 func (uc *LogUseCaseImpl) GetLogList(userID int) ([]*client.Log, error) {
@@ -112,8 +114,15 @@ func NewLogUseCase() (*LogUseCaseImpl, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	usrRepo, err := ur.NewUserRepo()
+	if err != nil {
+		return nil, err
+	}
+
 	return &LogUseCaseImpl{
 		logRepo:      logRepo,
 		exerciseRepo: exerRepo,
+		userRepo:     usrRepo,
 	}, nil
 }

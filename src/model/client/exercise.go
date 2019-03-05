@@ -11,3 +11,7 @@ type Exercise struct {
 	TargetSets      []Set  `json:"target_sets,omitempty"`
 	Quantity        int    `json:"quantity,omitempty"`
 }
+
+func (e *Exercise) SetQuantity(q int) {
+	e.Quantity = q
+}

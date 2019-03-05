@@ -1,6 +1,8 @@
 package exercise
 
 import (
+	"errors"
+
 	"github.com/jmoiron/sqlx"
 
 	"github.com/rmitsubayashi/bodyweight-server/src/model/server"
@@ -71,6 +73,18 @@ func (er *ExerciseRepoImpl) FindUserExercises(userID int, categoryID int) (*[]se
 	}
 
 	return &ue, m, nil
+}
+
+func (er *ExerciseRepoImpl) FindRandomExercise(catID int, minLev int, maxLev int, seed int, count int) (*[]server.Exercise, error) {
+	selectQuery := `
+	select * FROM exercise WHERE category_id=? AND level BETWEEN ? AND ?
+	ORDER BY RAND(?) LIMIT ?
+	`
+	var e []server.Exercise
+	if err := er.conn.Select(&e, selectQuery, catID, minLev, maxLev, seed, count); err != nil {
+		return nil, errors.New("error getting random exercise" + err.Error())
+	}
+	return &e, nil
 }
 
 func (er *ExerciseRepoImpl) AddUserExercise(e *server.UserExercise) error {
