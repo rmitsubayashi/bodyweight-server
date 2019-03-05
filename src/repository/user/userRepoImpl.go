@@ -39,6 +39,17 @@ func (ur *UserRepoImpl) GetUser(uid int) (*server.User, error) {
 	return &user, err
 }
 
+func (ur *UserRepoImpl) ChangePointsBy(uid int, p int) error {
+	changePointsStatement := `
+	UPDATE user
+	SET points=points+?
+	WHERE id=?
+	`
+
+	_, err := ur.conn.Exec(changePointsStatement, p, uid)
+	return err
+}
+
 func NewUserRepo() (*UserRepoImpl, error) {
 	conn, err := repository.NewDBConnection()
 	if err != nil {

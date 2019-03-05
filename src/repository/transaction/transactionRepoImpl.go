@@ -61,14 +61,17 @@ func (tr *TransactionRepoImpl) TransactionExists(t server.Transaction, date time
 		return false, err
 	}
 	matchedCt := 0
-	for _, e := range te {
-		for _, compE := range t.Exercises {
+	for _, e := range t.Exercises {
+		log.Printf("e: %+v\n", e)
+		for _, compE := range te {
+			log.Printf("compE: %v\n", compE)
 			if e.ExerciseID == compE.ExerciseID && e.Amount == compE.Amount {
-				matchedCt += 1
+				matchedCt++
 				break
 			}
 		}
 	}
+	log.Printf("matched: %d", matchedCt)
 	return (matchedCt == len(t.Exercises)), nil
 }
 

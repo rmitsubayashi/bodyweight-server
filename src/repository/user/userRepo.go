@@ -7,4 +7,5 @@ import (
 type UserRepo interface {
 	AddUser() error
 	GetUser(int) (*server.User, error)
+	ChangePointsBy(userID int, amount int) error
 }

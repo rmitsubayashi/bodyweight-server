@@ -91,11 +91,11 @@ func (er *ExerciseRepoImpl) AddUserExercise(e *server.UserExercise) error {
 	checkExistingExerciseStatement := `
 	SELECT COUNT(*) FROM user_exercise WHERE user_id=? AND exercise_id=?
 	`
-	var rowCt *int
+	var rowCt int
 	if err := er.conn.Get(&rowCt, checkExistingExerciseStatement, e.UserID, e.ExerciseID); err != nil {
 		return err
 	}
-	if *rowCt == 0 {
+	if rowCt == 0 {
 		insertExerciseStatement := `
 		INSERT INTO user_exercise (user_id, exercise_id, amount) VALUES (?, ?, ?)
 		`
