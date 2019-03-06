@@ -55,11 +55,22 @@ func (uc *LogUseCaseImpl) RecordLog(log client.Log, uid int) (*client.Feedback, 
 		return nil, err
 	}
 
+	allExerciseIDs := make(map[int]bool)
+	for _, s := range log.Sets {
+		allExerciseIDs[s.Exercise.ID] = true
+	}
+	for id := range allExerciseIDs {
+		if err := uc.exerciseRepo.RemoveUserExercise(uid, id, 1); err != nil {
+			return nil, err
+		}
+	}
+
 	feedback := uc.generateFeedback(log)
 	p := feedback.AfterPoints - feedback.PreviousPoints
 	if err := uc.userRepo.ChangePointsBy(uid, p); err != nil {
 		return nil, err
 	}
+
 	return &feedback, nil
 }
 

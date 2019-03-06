@@ -110,6 +110,33 @@ func (er *ExerciseRepoImpl) AddUserExercise(e *server.UserExercise) error {
 	}
 }
 
+func (er *ExerciseRepoImpl) RemoveUserExercise(uid int, exerciseID int, amount int) error {
+	currAmountStatement := `
+	SELECT amount FROM user_exercise WHERE user_id=? AND exercise_id=?
+	`
+	var currAmount int
+	if err := er.conn.Get(&currAmount, currAmountStatement, uid, exerciseID); err != nil {
+		return err
+	}
+	newAmount := currAmount - amount
+	if newAmount < 0 {
+		return errors.New("don't have enough exercises")
+	}
+	if newAmount == 0 {
+		removeExerciseStatement := `
+		DELETE FROM user_exercise WHERE user_id=? AND exercise_id=?
+		`
+		_, err := er.conn.Exec(removeExerciseStatement, uid, exerciseID)
+		return err
+	} else {
+		updateExerciseStatement := `
+		UPDATE user_exercise SET amount = ? WHERE user_id=? AND exercise_id=?
+		`
+		_, err := er.conn.Exec(updateExerciseStatement, newAmount, uid, exerciseID)
+		return err
+	}
+}
+
 func NewExerciseRepo() (*ExerciseRepoImpl, error) {
 	conn, err := repository.NewDBConnection()
 	if err != nil {
