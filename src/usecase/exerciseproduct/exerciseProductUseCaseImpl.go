@@ -75,7 +75,7 @@ func calculateMinMaxLevel(lvl int) (int, int) {
 }
 
 func (uc *ExerciseProductUseCaseImpl) BuyExerciseProduct(userID int, ep client.ExerciseProduct) error {
-	//validate that the user hasn't altered the product
+	// check that the user hasn't altered the product
 	availableProducts, err := uc.GetTodayExerciseProducts(userID)
 	if err != nil {
 		return err
@@ -90,6 +90,19 @@ func (uc *ExerciseProductUseCaseImpl) BuyExerciseProduct(userID int, ep client.E
 
 	if !matched {
 		return errors.New("invalid product")
+	}
+
+	// check that the user has enough points
+	u, err := uc.userRepo.GetUser(userID)
+	if err != nil {
+		return err
+	}
+	if u.Points < ep.Price {
+		return errors.New("not enough points")
+	}
+
+	if err := uc.userRepo.ChangePointsBy(userID, (-1)*ep.Price); err != nil {
+		return err
 	}
 
 	ues := clientExerciseProductToServerUserExercises(ep, userID)

@@ -7,5 +7,5 @@ import (
 type LogUseCase interface {
 	GetLogList(userID int) ([]*client.Log, error)
 	GetLogInfo(logID int) (*client.Log, error)
-	RecordLog(log client.Log) (*client.Feedback, error)
+	RecordLog(log client.Log, uid int) (*client.Feedback, error)
 }

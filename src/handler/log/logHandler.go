@@ -69,7 +69,7 @@ func (h *LogHandler) PostLog(w http.ResponseWriter, r *http.Request) {
 		util.SendError(w, errors.New("no sets"), http.StatusBadRequest)
 		return
 	}
-	feedback, err := h.UseCase.RecordLog(l)
+	feedback, err := h.UseCase.RecordLog(l, 1)
 	if err != nil {
 		util.SendError(w, err, http.StatusInternalServerError)
 		return

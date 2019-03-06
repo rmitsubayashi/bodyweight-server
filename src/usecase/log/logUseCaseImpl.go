@@ -49,13 +49,17 @@ func (uc *LogUseCaseImpl) GetLogInfo(logID int) (*client.Log, error) {
 	return &clientLog, nil
 }
 
-func (uc *LogUseCaseImpl) RecordLog(log client.Log) (*client.Feedback, error) {
-	logForServer := clientToServerLog(log)
+func (uc *LogUseCaseImpl) RecordLog(log client.Log, uid int) (*client.Feedback, error) {
+	logForServer := clientToServerLog(log, uid)
 	if err := uc.logRepo.AddLog(logForServer); err != nil {
 		return nil, err
 	}
 
 	feedback := uc.generateFeedback(log)
+	p := feedback.AfterPoints - feedback.PreviousPoints
+	if err := uc.userRepo.ChangePointsBy(uid, p); err != nil {
+		return nil, err
+	}
 	return &feedback, nil
 }
 
@@ -68,7 +72,7 @@ func (uc *LogUseCaseImpl) generateFeedback(log client.Log) client.Feedback {
 		},
 		PreviousPoints: 2300,
 		AfterPoints:    2400,
-		UnlockedExercises: []client.UnlockedExercise{
+		 UnlockedExercises: []client.UnlockedExercise{
 			client.UnlockedExercise{
 				Exercise: client.Exercise{
 					ID:    24,

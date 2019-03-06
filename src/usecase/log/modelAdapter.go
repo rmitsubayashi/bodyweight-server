@@ -6,7 +6,7 @@ import (
 	"github.com/rmitsubayashi/bodyweight-server/src/usecase/util"
 )
 
-func clientToServerLog(cl client.Log) server.Log {
+func clientToServerLog(cl client.Log, uid int) server.Log {
 	var logSets []server.LogSet
 	for _, set := range cl.Sets {
 		logSet := server.LogSet{
@@ -20,7 +20,7 @@ func clientToServerLog(cl client.Log) server.Log {
 
 	return server.Log{
 		ID:         cl.ID,
-		UserID:     1,
+		UserID:     uid,
 		CategoryID: cl.CategoryID,
 		Sets:       logSets,
 	}
