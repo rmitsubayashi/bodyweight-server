@@ -89,19 +89,25 @@ func (er *ExerciseRepoImpl) FindRandomExercise(catID int, minLev int, maxLev int
 
 func (er *ExerciseRepoImpl) AddUserExercise(e *server.UserExercise) error {
 	checkExistingExerciseStatement := `
-	SELECT COUNT(*) FROM user_exercise WHERE user_id=? AND exercise_id=?
+	SELECT * FROM user_exercise WHERE user_id=? AND exercise_id=?
 	`
-	var rowCt int
-	if err := er.conn.Get(&rowCt, checkExistingExerciseStatement, e.UserID, e.ExerciseID); err != nil {
-		return err
+	row, err := er.conn.Queryx(checkExistingExerciseStatement, e.UserID, e.ExerciseID)
+	if err != nil {
+		return errors.New("errrrr" + err.Error())
 	}
-	if rowCt == 0 {
+	if !row.Next() {
 		insertExerciseStatement := `
 		INSERT INTO user_exercise (user_id, exercise_id, amount) VALUES (?, ?, ?)
 		`
 		_, err := er.conn.Exec(insertExerciseStatement, e.UserID, e.ExerciseID, e.Amount)
 		return err
 	} else {
+		var qe server.UserExercise
+		row.StructScan(&qe)
+		// -1 = default exercise
+		if qe.Amount == -1 {
+			return nil
+		}
 		updateExerciseStatement := `
 		UPDATE user_exercise SET amount = amount + ? WHERE user_id=? AND exercise_id=?
 		`
@@ -117,6 +123,10 @@ func (er *ExerciseRepoImpl) RemoveUserExercise(uid int, exerciseID int, amount i
 	var currAmount int
 	if err := er.conn.Get(&currAmount, currAmountStatement, uid, exerciseID); err != nil {
 		return err
+	}
+	// -1 means it's a default exercise
+	if currAmount == -1 {
+		return nil
 	}
 	newAmount := currAmount - amount
 	if newAmount < 0 {

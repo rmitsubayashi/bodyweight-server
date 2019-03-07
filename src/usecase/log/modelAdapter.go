@@ -80,3 +80,19 @@ func serverToClientSet(ls server.LogSet, e server.Exercise) client.Set {
 		Value:     ls.Value,
 	}
 }
+
+func clientUnlockedExerciseToServerUserExercise(ue client.UnlockedExercise, uid int, amount int) server.UserExercise {
+	return server.UserExercise{
+		ExerciseID: ue.Exercise.ID,
+		UserID:     uid,
+		Amount:     amount,
+	}
+}
+
+func clientExerciseToServerUserExercise(e client.Exercise, uid int) server.UserExercise {
+	return server.UserExercise{
+		ExerciseID: e.ID,
+		UserID:     uid,
+		Amount:     e.Quantity,
+	}
+}

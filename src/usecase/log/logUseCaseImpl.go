@@ -65,13 +65,22 @@ func (uc *LogUseCaseImpl) RecordLog(log client.Log, uid int) (*client.Feedback, 
 		}
 	}
 
-	feedback := uc.generateFeedback(log)
-	p := feedback.AfterPoints - feedback.PreviousPoints
+	fb := uc.generateFeedback(log)
+	p := fb.AfterPoints - fb.PreviousPoints
 	if err := uc.userRepo.ChangePointsBy(uid, p); err != nil {
 		return nil, err
 	}
+	for _, ue := range fb.UnlockedExercises {
+		//unlocked exercises are all default (amount = -1)
+		e := clientUnlockedExerciseToServerUserExercise(ue, uid, -1)
+		uc.exerciseRepo.AddUserExercise(&e)
+	}
+	for _, de := range fb.DroppedExercises {
+		e := clientExerciseToServerUserExercise(de, uid)
+		uc.exerciseRepo.AddUserExercise(&e)
+	}
 
-	return &feedback, nil
+	return &fb, nil
 }
 
 func (uc *LogUseCaseImpl) generateFeedback(log client.Log) client.Feedback {
@@ -83,10 +92,10 @@ func (uc *LogUseCaseImpl) generateFeedback(log client.Log) client.Feedback {
 		},
 		PreviousPoints: 2300,
 		AfterPoints:    2400,
-		 UnlockedExercises: []client.UnlockedExercise{
+		UnlockedExercises: []client.UnlockedExercise{
 			client.UnlockedExercise{
 				Exercise: client.Exercise{
-					ID:    24,
+					ID:    22,
 					Title: "close arm pushups",
 				},
 				LevelUnlocked: 20,
@@ -108,12 +117,7 @@ func (uc *LogUseCaseImpl) generateFeedback(log client.Log) client.Feedback {
 				CategoryID: 0,
 				Title:      "leg-raised pushups",
 				Level:      6,
-			},
-			client.Exercise{
-				ID:         22,
-				CategoryID: 0,
-				Title:      "one-legged pushups",
-				Level:      5,
+				Quantity:   2,
 			},
 		},
 	}
