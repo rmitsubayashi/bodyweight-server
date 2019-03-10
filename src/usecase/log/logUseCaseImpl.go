@@ -1,7 +1,10 @@
 package log
 
 import (
+	"math"
+
 	"github.com/rmitsubayashi/bodyweight-server/src/model/client"
+	mcomm "github.com/rmitsubayashi/bodyweight-server/src/model/common"
 	er "github.com/rmitsubayashi/bodyweight-server/src/repository/exercise"
 	lr "github.com/rmitsubayashi/bodyweight-server/src/repository/log"
 	ur "github.com/rmitsubayashi/bodyweight-server/src/repository/user"
@@ -65,7 +68,11 @@ func (uc *LogUseCaseImpl) RecordLog(log client.Log, uid int) (*client.Feedback, 
 		}
 	}
 
-	fb := uc.generateFeedback(log)
+	fbPtr, err := uc.generateFeedback(log, uid)
+	if err != nil {
+		return nil, err
+	}
+	fb := *fbPtr
 	p := fb.AfterPoints - fb.PreviousPoints
 	if err := uc.userRepo.ChangePointsBy(uid, p); err != nil {
 		return nil, err
@@ -80,18 +87,25 @@ func (uc *LogUseCaseImpl) RecordLog(log client.Log, uid int) (*client.Feedback, 
 		uc.exerciseRepo.AddUserExercise(&e)
 	}
 
-	return &fb, nil
+	return fbPtr, nil
 }
 
-func (uc *LogUseCaseImpl) generateFeedback(log client.Log) client.Feedback {
-	return client.Feedback{
-		ID:      2,
+func (uc *LogUseCaseImpl) generateFeedback(log client.Log, uid int) (*client.Feedback, error) {
+	u, err := uc.userRepo.GetUser(uid)
+	if err != nil {
+		return nil, err
+	}
+
+	p := uc.calculatePoints(log.Sets)
+	// ue := uc.checkUnlockedExercises(log.Sets)
+
+	return &client.Feedback{
 		Comment: "Great job doing your first ever one arm pushup! You're definitely getting stronger!",
 		CommentHighlightSpans: [][2]int{
 			[2]int{21, 31},
 		},
-		PreviousPoints: 2300,
-		AfterPoints:    2400,
+		PreviousPoints: u.Points,
+		AfterPoints:    u.Points + p,
 		UnlockedExercises: []client.UnlockedExercise{
 			client.UnlockedExercise{
 				Exercise: client.Exercise{
@@ -120,7 +134,24 @@ func (uc *LogUseCaseImpl) generateFeedback(log client.Log) client.Feedback {
 				Quantity:   2,
 			},
 		},
+	}, nil
+}
+
+func (uc *LogUseCaseImpl) calculatePoints(sets []client.Set) int {
+	total := 0
+	for _, set := range sets {
+		var relativeAmount int
+		switch mt := set.Exercise.MeasurementType; mt {
+		case mcomm.MEASUREMENT_TYPE_REPS:
+			relativeAmount = set.Value * 100
+		case mcomm.MEASUREMENT_TYPE_SECONDS:
+			relativeAmount = set.Value * 10
+		}
+
+		point := int(math.Pow(2, float64(set.Exercise.Level))) * relativeAmount
+		total += point
 	}
+	return total
 }
 
 func NewLogUseCase() (*LogUseCaseImpl, error) {
