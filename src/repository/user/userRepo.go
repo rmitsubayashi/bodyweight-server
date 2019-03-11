@@ -8,4 +8,5 @@ type UserRepo interface {
 	AddUser() error
 	GetUser(int) (*server.User, error)
 	ChangePointsBy(userID int, amount int) error
+	SetUserLevel(uid int, catID int, level int) error
 }

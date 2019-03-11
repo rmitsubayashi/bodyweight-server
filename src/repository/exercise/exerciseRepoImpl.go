@@ -75,9 +75,10 @@ func (er *ExerciseRepoImpl) FindUserExercises(userID int, categoryID int) (*[]se
 	return &ue, m, nil
 }
 
+// note that default exercises are excluded
 func (er *ExerciseRepoImpl) FindRandomExercise(catID int, minLev int, maxLev int, seed int, count int) (*[]server.Exercise, error) {
 	selectQuery := `
-	select * FROM exercise WHERE category_id=? AND level BETWEEN ? AND ?
+	select * FROM exercise WHERE category_id=?  AND is_default=0 AND level BETWEEN ? AND ?
 	ORDER BY RAND(?) LIMIT ?
 	`
 	var e []server.Exercise
@@ -145,6 +146,18 @@ func (er *ExerciseRepoImpl) RemoveUserExercise(uid int, exerciseID int, amount i
 		_, err := er.conn.Exec(updateExerciseStatement, newAmount, uid, exerciseID)
 		return err
 	}
+}
+
+func (er *ExerciseRepoImpl) FindDefaultExercise(catID int, level int) (*server.Exercise, error) {
+	selectStatement := `
+	SELECT * FROM exercise WHERE
+	is_default=1 AND category_id=? AND level=?
+	`
+	var e server.Exercise
+	if err := er.conn.Get(&e, selectStatement, catID, level); err != nil {
+		return nil, err
+	}
+	return &e, nil
 }
 
 func NewExerciseRepo() (*ExerciseRepoImpl, error) {

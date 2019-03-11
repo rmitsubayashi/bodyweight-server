@@ -56,6 +56,34 @@ func serverToClientLogWithExerciseDetails(sl server.Log, cs []client.Set) client
 	}
 }
 
+func serverToClientExercise(se server.Exercise) client.Exercise {
+	var cTargetSets []client.Set
+	for _, sts := range se.TargetSets {
+		cts := serverToClientTargetSet(sts)
+		cTargetSets = append(cTargetSets, cts)
+	}
+	return client.Exercise{
+		ID:              se.ID,
+		Title:           se.Title,
+		Description:     se.Description,
+		ImageURL:        se.ImageURL,
+		MeasurementType: se.MeasurementType,
+		CategoryID:      se.CategoryID,
+		Level:           se.Level,
+		TargetSets:      cTargetSets,
+	}
+}
+
+func serverToClientTargetSet(ts server.TargetSet) client.Set {
+	return client.Set{
+		Exercise: client.Exercise{
+			ID: ts.ExerciseID,
+		},
+		SetNumber: ts.SetNumber,
+		Value:     ts.Value,
+	}
+}
+
 func serverToClientSet(ls server.LogSet, e server.Exercise) client.Set {
 	var clientTargetSets []client.Set
 	for _, targetSet := range e.TargetSets {

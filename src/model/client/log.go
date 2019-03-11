@@ -5,5 +5,4 @@ type Log struct {
 	CategoryID int    `json:"category_id"`
 	Date       string `json:"date"`
 	Sets       []Set  `json:"sets"`
-	Memo       string `json:"memo"`
 }

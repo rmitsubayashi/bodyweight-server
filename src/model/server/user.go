@@ -22,3 +22,22 @@ func (u *User) GetCatLevels() []int {
 	catLevels = append(catLevels, u.Cat6Level)
 	return catLevels
 }
+
+func GetCatLevelColName(catID int) string {
+	switch catID {
+	case 1:
+		return "category1_level"
+	case 2:
+		return "category2_level"
+	case 3:
+		return "category3_level"
+	case 4:
+		return "category4_level"
+	case 5:
+		return "category5_level"
+	case 6:
+		return "category6_level"
+	default:
+		return ""
+	}
+}

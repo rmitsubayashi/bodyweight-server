@@ -1,6 +1,7 @@
 package log
 
 import (
+	"log"
 	"math"
 
 	"github.com/rmitsubayashi/bodyweight-server/src/model/client"
@@ -52,14 +53,14 @@ func (uc *LogUseCaseImpl) GetLogInfo(logID int) (*client.Log, error) {
 	return &clientLog, nil
 }
 
-func (uc *LogUseCaseImpl) RecordLog(log client.Log, uid int) (*client.Feedback, error) {
-	logForServer := clientToServerLog(log, uid)
+func (uc *LogUseCaseImpl) RecordLog(l client.Log, uid int) (*client.Feedback, error) {
+	logForServer := clientToServerLog(l, uid)
 	if err := uc.logRepo.AddLog(logForServer); err != nil {
 		return nil, err
 	}
 
 	allExerciseIDs := make(map[int]bool)
-	for _, s := range log.Sets {
+	for _, s := range l.Sets {
 		allExerciseIDs[s.Exercise.ID] = true
 	}
 	for id := range allExerciseIDs {
@@ -68,7 +69,7 @@ func (uc *LogUseCaseImpl) RecordLog(log client.Log, uid int) (*client.Feedback, 
 		}
 	}
 
-	fbPtr, err := uc.generateFeedback(log, uid)
+	fbPtr, err := uc.generateFeedback(l, uid)
 	if err != nil {
 		return nil, err
 	}
@@ -78,14 +79,20 @@ func (uc *LogUseCaseImpl) RecordLog(log client.Log, uid int) (*client.Feedback, 
 		return nil, err
 	}
 	for _, ue := range fb.UnlockedExercises {
-		//unlocked exercises are all default (amount = -1)
+		//unlocked exercises are all default exercises (amount = -1)
 		e := clientUnlockedExerciseToServerUserExercise(ue, uid, -1)
-		uc.exerciseRepo.AddUserExercise(&e)
+		if err := uc.exerciseRepo.AddUserExercise(&e); err != nil {
+			return nil, err
+		}
+		if err := uc.userRepo.SetUserLevel(uid, ue.Exercise.CategoryID, ue.Exercise.Level); err != nil {
+			return nil, err
+		}
 	}
-	for _, de := range fb.DroppedExercises {
-		e := clientExerciseToServerUserExercise(de, uid)
-		uc.exerciseRepo.AddUserExercise(&e)
-	}
+	/*
+		for _, de := range fb.DroppedExercises {
+			e := clientExerciseToServerUserExercise(de, uid)
+			uc.exerciseRepo.AddUserExercise(&e)
+		}*/
 
 	return fbPtr, nil
 }
@@ -96,35 +103,27 @@ func (uc *LogUseCaseImpl) generateFeedback(log client.Log, uid int) (*client.Fee
 		return nil, err
 	}
 
+	//we only have the exercise IDs so fetch the required info.
+	// (we can have the client pass in the info, but we want the DB to be the SSOT)
+	logPtr, err := uc.populateExerciseInfo(log)
+	if err != nil {
+		return nil, err
+	}
+	log = *logPtr
 	p := uc.calculatePoints(log.Sets)
-	// ue := uc.checkUnlockedExercises(log.Sets)
+	ues, err := uc.checkUnlockedExercises(log.Sets, log.CategoryID, uid)
+	if err != nil {
+		return nil, err
+	}
 
 	return &client.Feedback{
 		Comment: "Great job doing your first ever one arm pushup! You're definitely getting stronger!",
 		CommentHighlightSpans: [][2]int{
 			[2]int{21, 31},
 		},
-		PreviousPoints: u.Points,
-		AfterPoints:    u.Points + p,
-		UnlockedExercises: []client.UnlockedExercise{
-			client.UnlockedExercise{
-				Exercise: client.Exercise{
-					ID:    22,
-					Title: "close arm pushups",
-				},
-				LevelUnlocked: 20,
-				OtherExercises: []client.Exercise{
-					client.Exercise{
-						ID:    29,
-						Title: "wide-arm pushups",
-					},
-					client.Exercise{
-						ID:    30,
-						Title: "Hindu pushups",
-					},
-				},
-			},
-		},
+		PreviousPoints:    u.Points,
+		AfterPoints:       u.Points + p,
+		UnlockedExercises: *ues,
 		DroppedExercises: []client.Exercise{
 			client.Exercise{
 				ID:         21,
@@ -134,6 +133,38 @@ func (uc *LogUseCaseImpl) generateFeedback(log client.Log, uid int) (*client.Fee
 				Quantity:   2,
 			},
 		},
+	}, nil
+}
+
+func (uc *LogUseCaseImpl) populateExerciseInfo(l client.Log) (*client.Log, error) {
+	eIDSet := make(map[int]bool)
+	for _, s := range l.Sets {
+		eIDSet[s.Exercise.ID] = true
+	}
+	es := make(map[int]client.Exercise)
+	for eID := range eIDSet {
+		ePtr, err := uc.exerciseRepo.GetExercise(eID)
+		if err != nil {
+			return nil, err
+		}
+		e := serverToClientExercise(*ePtr)
+		log.Printf("%+v\n\n", e)
+		es[eID] = e
+	}
+	var sets []client.Set
+	for _, s := range l.Sets {
+		newS := client.Set{
+			Exercise:  es[s.Exercise.ID],
+			SetNumber: s.SetNumber,
+			Value:     s.Value,
+		}
+		sets = append(sets, newS)
+	}
+	return &client.Log{
+		ID:         l.ID,
+		CategoryID: l.CategoryID,
+		Date:       l.Date,
+		Sets:       sets,
 	}, nil
 }
 
@@ -152,6 +183,83 @@ func (uc *LogUseCaseImpl) calculatePoints(sets []client.Set) int {
 		total += point
 	}
 	return total
+}
+
+func (uc *LogUseCaseImpl) checkUnlockedExercises(sets []client.Set, catID int, uid int) (*[]client.UnlockedExercise, error) {
+	var ues []client.UnlockedExercise
+	var es []client.Exercise
+	for _, s := range sets {
+		es = append(es, s.Exercise)
+	}
+
+	defaultExists := false
+	for _, e := range es {
+		se, err := uc.exerciseRepo.GetExercise(e.ID)
+		if err != nil {
+			return nil, err
+		}
+		if se.IsDefault {
+			defaultExists = true
+		}
+	}
+	if !defaultExists {
+		return &ues, nil
+	}
+
+	u, err := uc.userRepo.GetUser(uid)
+	if err != nil {
+		return nil, err
+	}
+	uCats := u.GetCatLevels()
+	catLvl := uCats[catID-1]
+	for _, e := range es {
+		// if the user's level is lower than the exercise's level,
+		// there is nothing to unlock.
+		// also, the user can't do exercises higher than the user's level
+		if e.Level != catLvl {
+			continue
+		}
+		targetSetIndex := 0
+		unlockable := true
+		for _, s := range sets {
+			if s.Exercise.ID != e.ID {
+				continue
+			}
+			if e.TargetSets[targetSetIndex].Value > s.Value {
+				unlockable = false
+				break
+			}
+			targetSetIndex++
+			if targetSetIndex >= len(e.TargetSets) {
+				break
+			}
+		}
+		if unlockable {
+			e, err := uc.exerciseRepo.FindDefaultExercise(catID, catLvl+1)
+			if err != nil {
+				return nil, err
+			}
+			// we want the user to get a better picture of what he has unlocked
+			otherEs, err := uc.exerciseRepo.FindRandomExercise(catID, catLvl+1, catLvl+1, 0, 2)
+			if err != nil {
+				return nil, err
+			}
+			ce := serverToClientExercise(*e)
+			var coes []client.Exercise
+			for _, otherE := range *otherEs {
+				cOtherE := serverToClientExercise(otherE)
+				coes = append(coes, cOtherE)
+			}
+			ue := client.UnlockedExercise{
+				Exercise:       ce,
+				OtherExercises: coes,
+			}
+			ues = append(ues, ue)
+		}
+	}
+
+	return &ues, nil
+
 }
 
 func NewLogUseCase() (*LogUseCaseImpl, error) {

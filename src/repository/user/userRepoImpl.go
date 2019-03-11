@@ -50,6 +50,18 @@ func (ur *UserRepoImpl) ChangePointsBy(uid int, p int) error {
 	return err
 }
 
+func (ur *UserRepoImpl) SetUserLevel(uid int, catID int, level int) error {
+	catCol := server.GetCatLevelColName(catID)
+	setLevelStatement := fmt.Sprintf(`
+	UPDATE user
+	SET %s=?
+	WHERE id=?
+	`, catCol)
+
+	_, err := ur.conn.Exec(setLevelStatement, level, uid)
+	return err
+}
+
 func NewUserRepo() (*UserRepoImpl, error) {
 	conn, err := repository.NewDBConnection()
 	if err != nil {
