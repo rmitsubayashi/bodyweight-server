@@ -1,14 +1,17 @@
 package log
 
 import (
-	"log"
 	"math"
+	"math/rand"
+	"time"
 
 	"github.com/rmitsubayashi/bodyweight-server/src/model/client"
 	mcomm "github.com/rmitsubayashi/bodyweight-server/src/model/common"
+	"github.com/rmitsubayashi/bodyweight-server/src/model/server"
 	er "github.com/rmitsubayashi/bodyweight-server/src/repository/exercise"
 	lr "github.com/rmitsubayashi/bodyweight-server/src/repository/log"
 	ur "github.com/rmitsubayashi/bodyweight-server/src/repository/user"
+	"github.com/rmitsubayashi/bodyweight-server/src/usecase/util"
 )
 
 type LogUseCaseImpl struct {
@@ -88,21 +91,16 @@ func (uc *LogUseCaseImpl) RecordLog(l client.Log, uid int) (*client.Feedback, er
 			return nil, err
 		}
 	}
-	/*
-		for _, de := range fb.DroppedExercises {
-			e := clientExerciseToServerUserExercise(de, uid)
-			uc.exerciseRepo.AddUserExercise(&e)
-		}*/
+
+	for _, de := range fb.DroppedExercises {
+		e := clientExerciseToServerUserExercise(de, uid)
+		uc.exerciseRepo.AddUserExercise(&e)
+	}
 
 	return fbPtr, nil
 }
 
 func (uc *LogUseCaseImpl) generateFeedback(log client.Log, uid int) (*client.Feedback, error) {
-	u, err := uc.userRepo.GetUser(uid)
-	if err != nil {
-		return nil, err
-	}
-
 	//we only have the exercise IDs so fetch the required info.
 	// (we can have the client pass in the info, but we want the DB to be the SSOT)
 	logPtr, err := uc.populateExerciseInfo(log)
@@ -111,10 +109,16 @@ func (uc *LogUseCaseImpl) generateFeedback(log client.Log, uid int) (*client.Fee
 	}
 	log = *logPtr
 	p := uc.calculatePoints(log.Sets)
-	ues, err := uc.checkUnlockedExercises(log.Sets, log.CategoryID, uid)
+	uPtr, err := uc.userRepo.GetUser(uid)
 	if err != nil {
 		return nil, err
 	}
+	u := *uPtr
+	ues, err := uc.checkUnlockedExercises(log.Sets, log.CategoryID, u)
+	if err != nil {
+		return nil, err
+	}
+	des, err := uc.getDroppedExercises(u)
 
 	return &client.Feedback{
 		Comment: "Great job doing your first ever one arm pushup! You're definitely getting stronger!",
@@ -124,15 +128,7 @@ func (uc *LogUseCaseImpl) generateFeedback(log client.Log, uid int) (*client.Fee
 		PreviousPoints:    u.Points,
 		AfterPoints:       u.Points + p,
 		UnlockedExercises: *ues,
-		DroppedExercises: []client.Exercise{
-			client.Exercise{
-				ID:         21,
-				CategoryID: 0,
-				Title:      "leg-raised pushups",
-				Level:      6,
-				Quantity:   2,
-			},
-		},
+		DroppedExercises:  *des,
 	}, nil
 }
 
@@ -148,7 +144,6 @@ func (uc *LogUseCaseImpl) populateExerciseInfo(l client.Log) (*client.Log, error
 			return nil, err
 		}
 		e := serverToClientExercise(*ePtr)
-		log.Printf("%+v\n\n", e)
 		es[eID] = e
 	}
 	var sets []client.Set
@@ -185,7 +180,7 @@ func (uc *LogUseCaseImpl) calculatePoints(sets []client.Set) int {
 	return total
 }
 
-func (uc *LogUseCaseImpl) checkUnlockedExercises(sets []client.Set, catID int, uid int) (*[]client.UnlockedExercise, error) {
+func (uc *LogUseCaseImpl) checkUnlockedExercises(sets []client.Set, catID int, u server.User) (*[]client.UnlockedExercise, error) {
 	var ues []client.UnlockedExercise
 	var es []client.Exercise
 	for _, s := range sets {
@@ -206,10 +201,6 @@ func (uc *LogUseCaseImpl) checkUnlockedExercises(sets []client.Set, catID int, u
 		return &ues, nil
 	}
 
-	u, err := uc.userRepo.GetUser(uid)
-	if err != nil {
-		return nil, err
-	}
 	uCats := u.GetCatLevels()
 	catLvl := uCats[catID-1]
 	for _, e := range es {
@@ -260,6 +251,46 @@ func (uc *LogUseCaseImpl) checkUnlockedExercises(sets []client.Set, catID int, u
 
 	return &ues, nil
 
+}
+
+// this won't get any drops from newly unlocked levels
+func (uc *LogUseCaseImpl) getDroppedExercises(u server.User) (*[]client.Exercise, error) {
+	rand.Seed(time.Now().UTC().Unix())
+	dropRate := 30
+	r := rand.Intn(100)
+	var es []client.Exercise
+	if r <= dropRate {
+		catIndex := rand.Intn(6)
+		uCatLvl := u.GetCatLevels()[catIndex]
+		//user more likely to drop higher level exercises
+		catLvlRandTtl := 0
+		w := 5
+		currW := 1
+		for i := 0; i < uCatLvl; i++ {
+			currW *= w
+			catLvlRandTtl += currW
+		}
+		catLvlRand := rand.Intn(catLvlRandTtl)
+		catLvl := 0
+		upper := w
+		for catLvlRand >= 0 {
+			catLvlRand -= upper
+			upper *= w
+			catLvl++
+		}
+		ses, err := uc.exerciseRepo.FindRandomExercise(
+			catIndex+1, catLvl, catLvl, util.FormatDateSeed(), 1)
+		if err != nil {
+			return nil, err
+		}
+		amount := rand.Intn(2) + 1
+		for _, se := range *ses {
+			ce := serverToClientExerciseWithAmount(se, amount)
+			es = append(es, ce)
+		}
+
+	}
+	return &es, nil
 }
 
 func NewLogUseCase() (*LogUseCaseImpl, error) {

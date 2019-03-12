@@ -74,6 +74,18 @@ func serverToClientExercise(se server.Exercise) client.Exercise {
 	}
 }
 
+func serverToClientExerciseWithAmount(se server.Exercise, a int) client.Exercise {
+	return client.Exercise{
+		ID:              se.ID,
+		Title:           se.Title,
+		Description:     se.Description,
+		ImageURL:        se.ImageURL,
+		CategoryID:      se.CategoryID,
+		Level:           se.Level,
+		Quantity: a,
+	}
+}
+
 func serverToClientTargetSet(ts server.TargetSet) client.Set {
 	return client.Set{
 		Exercise: client.Exercise{
