@@ -5,6 +5,6 @@ import (
 )
 
 type UserUseCase interface {
-	GetUserInfo(userID int) (*client.Points, error)
-	RegisterNewUser() error 
+	GetUserInfo(userID int) (*client.User, error)
+	RegisterNewUser() error
 }

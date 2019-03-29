@@ -36,7 +36,7 @@ returns Array(Exercise)
 returns Array(ExerciseProduct)
 
 ### POST /shop/exercises
-returns points
+returns nothing
 
 ## User
 **id** int
@@ -45,22 +45,16 @@ returns points
 
 **points** int
 
-### GET /users/points
-returns User.points
+**cat1_level** int
+
+...
+
+**cat6_level** int
+
+### GET /users
+returns User
 
 ### POST /users
-
-## Experience
-**category_id** int
-
-**level** int
-
-**next_level_current** int
-
-**next_level_total** int
-
-### GET /users/experiences
-returns Array(Experience)
 
 ## Log
 **id** int
@@ -71,15 +65,11 @@ returns Array(Experience)
 
 **sets** Array([Set](#set)) 
 
-**memo** string
-
-//Todo: get logs by month
-
 ### GET /users/logs
-returns Array(Log) without memo
+returns Array(Log)
 
 ### GET /users/logs/log_id
-returns Log with memo
+returns Log
 
 ### POST /users/logs
 returns Feedback
@@ -89,29 +79,18 @@ returns Feedback
 
 **comment_highlight_spans** Array([int, int]) //inclusive-exclusive
 
-**previous_experience** Experience
-
-**after_experience** Experience
-
-**experience_details** Array(ExperienceDetail)
-
 **previous_points** int
 
 **after_points** int
+
+**level_up** bool
 
 **unlocked_exercises** Array(UnlockedExercise)
 
 **dropped_exercises** Array(Exercise)
 
-## ExperienceDetail
-**description** string
-
-**experience** int
-
 ## UnlockedExercise
 **exercise** Exercise
-
-**level_unlocked** int
 
 **other_exercises** Array(Exercise)
 

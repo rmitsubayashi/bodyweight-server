@@ -127,6 +127,7 @@ func (uc *LogUseCaseImpl) generateFeedback(log client.Log, uid int) (*client.Fee
 		},
 		PreviousPoints:    u.Points,
 		AfterPoints:       u.Points + p,
+		LevelUp:           len(*ues) != 0,
 		UnlockedExercises: *ues,
 		DroppedExercises:  *des,
 	}, nil

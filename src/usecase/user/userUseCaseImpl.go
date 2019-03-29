@@ -9,10 +9,13 @@ type UserUseCaseImpl struct {
 	userRepo ur.UserRepo
 }
 
-func (uuc *UserUseCaseImpl) GetUserInfo(userID int) (*client.Points, error) {
-	return &client.Points{
-		Value: 200,
-	}, nil
+func (uuc *UserUseCaseImpl) GetUserInfo(userID int) (*client.User, error) {
+	su, err := uuc.userRepo.GetUser(userID)
+	if err != nil {
+		return nil, err
+	}
+	cu := serverToClientUser(*su)
+	return &cu, nil
 }
 
 func (uuc *UserUseCaseImpl) RegisterNewUser() error {

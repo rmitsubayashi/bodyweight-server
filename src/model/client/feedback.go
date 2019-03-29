@@ -6,6 +6,7 @@ type Feedback struct {
 	CommentHighlightSpans [][2]int           `json:"comment_highlight_spans"`
 	PreviousPoints        int                `json:"previous_points"`
 	AfterPoints           int                `json:"after_points"`
+	LevelUp               bool               `json:"level_up"`
 	UnlockedExercises     []UnlockedExercise `json:"unlocked_exercises"`
-	DroppedExercises      []Exercise  `json:"dropped_exercises"`
+	DroppedExercises      []Exercise         `json:"dropped_exercises"`
 }
